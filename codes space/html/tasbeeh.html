@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tasbeeh Counter</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --bg: #ecf0f1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        .timer-display {
+            font-size: 1.5rem;
+            color: #e67e22;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .active { background: #d4edda; color: #155724; }
+        .paused { background: #f8d7da; color: #721c24; }
+
+        .counter-box {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+            cursor: pointer;
+            min-height: 120px;
+        }
+        .tap-area {
+            background: var(--accent);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .tap-area:active { transform: scale(0.95); }
+        
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .reset-btn { background: #e74c3c; color: white; }
+        .set-btn { background: #3498db; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="timerDisplay" class="timer-display">Waqt: 00:00</div>
+    <div id="status" class="status-badge paused">Ruka hua (Idle)</div>
+    
+    <div class="counter-box" id="countDisplay">0</div>
+    
+    <div class="tap-area" onclick="handleTap()">TAP KAREIN</div>
+
+    <div class="controls">
+        <button class="set-btn" onclick="setTime()">Waqt Set Karein</button>
+        <button class="reset-btn" onclick="resetCounter()">Reset</button>
+    </div>
+</div>
+
+<script>
+    let count = parseInt(localStorage.getItem('tasbeehCount')) || 0;
+    let totalSeconds = parseInt(localStorage.getItem('tasbeehTime')) || 0;
+    let timerRunning = false;
+    let timerInterval;
+    let idleTimeout;
+
+    // UI Elements
+    const countDisplay = document.getElementById('countDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const statusBadge = document.getElementById('status');
+
+    // Initial Display
+    updateUI();
+
+    function handleTap() {
+        // Increment Count
+        count++;
+        updateUI();
+        
+        // Start or Resume Timer
+        if (!timerRunning && totalSeconds > 0) {
+            startTimer();
+        }
+
+        // Handle Auto-Pause (10 Seconds Rule)
+        clearTimeout(idleTimeout);
+        statusBadge.textContent = "Chall raha hai...";
+        statusBadge.className = "status-badge active";
+        
+        idleTimeout = setTimeout(() => {
+            pauseTimer();
+        }, 10000); // 10 seconds check
+
+        // Save progress
+        saveData();
+        
+        // Vibration
+        if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    function startTimer() {
+        if (timerRunning) return;
+        timerRunning = true;
+        timerInterval = setInterval(() => {
+            if (totalSeconds > 0) {
+                totalSeconds--;
+                updateUI();
+                saveData();
+            } else {
+                pauseTimer();
+                alert("Waqt mukammal ho gaya!");
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        statusBadge.textContent = "10s se ruka hua (Paused)";
+        statusBadge.className = "status-badge paused";
+    }
+
+    function setTime() {
+        let minutes = prompt("Kitne minute ki Tasbeeh karni hai?", "10");
+        if (minutes != null) {
+            totalSeconds = parseInt(minutes) * 60;
+            updateUI();
+            saveData();
+        }
+    }
+
+    function resetCounter() {
+        if (confirm("Kya aap ginti zero karna chahte hain?")) {
+            count = 0;
+            totalSeconds = 0;
+            pauseTimer();
+            localStorage.clear();
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        countDisplay.textContent = count;
+        let mins = Math.floor(totalSeconds / 60);
+        let secs = totalSeconds % 60;
+        timerDisplay.textContent = `Waqt: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function saveData() {
+        localStorage.setItem('tasbeehCount', count);
+        localStorage.setItem('tasbeehTime', totalSeconds);
+    }
+</script>
+
+</body>
+</html>
