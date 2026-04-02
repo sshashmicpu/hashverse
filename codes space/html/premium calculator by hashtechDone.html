@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PREMIUM CALCULATOR BY HASHTECH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CORE SYSTEM VARIABLES --- */
+        :root {
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-active: rgba(255, 255, 255, 0.18);
+            --border: #00ff00; 
+            --accent: #00ff00; 
+            --text: #ffffff;
+            --radius: 20px;
+            --bg-speed: 15s;
+            --btn-size: 72px;
+            --clip: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        /* --- SPLASH SCREEN STYLES --- */
+        #welcome-splash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .splash-icon { font-size: 50px; margin-bottom: 10px; }
+        .splash-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--accent); }
+        .splash-sub { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; }
+        .splash-dev { font-size: 0.7rem; opacity: 0.6; margin-top: 20px; }
+
+        /* --- THEME TEMPLATES --- */
+        body.temp-0 { background: #000000; --accent: #00ff00; --border: #00ff00; } 
+        body.temp-1 { background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); --accent: #fff; }
+        body.temp-2 { background: radial-gradient(circle at center, #22c55e 0%, #064e3b 100%); --accent: #facc15; }
+        body.temp-3 { background: #000 url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80') center/cover; --accent: #ff007a; }
+        body.temp-4 { background: #111; --accent: #00ff00; --border: #00ff00; }
+        body.temp-5 { background: linear-gradient(45deg, #ff00cc, #3333ff); --accent: #ffffff; --glass: rgba(255,255,255,0.15); --border: rgba(255,255,255,0.3); }
+        body.temp-6 { background: #1a1a1a; --accent: #ffffff; --glass: rgba(255,255,255,0.05); }
+        body.temp-7 { background: #f8f9fa; --accent: #007bff; --text: #1a1a1a; --glass: rgba(0,0,0,0.06); --border: rgba(0,0,0,0.12); --glass-active: rgba(0,0,0,0.12); } 
+
+        /* --- SHAPE MORPHING --- */
+        .shape-rect { --radius: 8px; --clip: none; }
+        .shape-soft { --radius: 24px; --clip: none; }
+        .shape-pill { --radius: 40px; --clip: none; }
+        .shape-circle { --radius: 50%; --clip: none; }
+        .shape-diamond { --radius: 0px; --clip: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        .shape-cut { --radius: 0px; --clip: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%); }
+
+        /* --- GLOBAL --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: all 0.3s ease; }
+        body { height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; overflow: hidden; color: var(--text); font-family: 'Montserrat', sans-serif; }
+
+        .app-container {
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border); padding: 30px 20px; position: relative;
+            background: rgba(0,0,0,0.05);
+        }
+
+        .top-nav { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; z-index: 1000; }
+        
+        /* --- BRANDING HEADER STYLE --- */
+        .brand-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, var(--accent), #fff, var(--accent));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            text-transform: uppercase;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .backspace-btn {
+            background: var(--glass); border: 1px solid var(--border); color: var(--accent);
+            padding: 10px 15px; border-radius: 12px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; font-size: 0.8rem;
+        }
+
+        /* --- DISPLAY --- */
+        .screen-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding-bottom: 10px; overflow: hidden; position: relative; }
+        
+        #video-container {
+            width: 100%; flex: 1; min-height: 250px; background: #000; border-radius: 15px; 
+            margin-bottom: 10px; display: none; overflow: hidden; border: 1px solid var(--border);
+        }
+        #main-video-player { width: 100%; height: 100%; object-fit: cover; }
+
+        #history-line { font-size: 1.1rem; opacity: 0.6; font-family: 'Orbitron', sans-serif; margin-bottom: 5px; width: 100%; text-align: right; font-weight: 400; }
+        #input-main {
+            font-size: 3.5rem; font-weight: 900; word-break: break-all; text-align: right;
+            line-height: 1.1; width: 100%; max-height: 120px; overflow-y: auto;
+            padding-right: 5px; font-family: 'Orbitron', sans-serif; letter-spacing: -1px;
+        }
+
+        .keypad-wrapper { flex-shrink: 0; }
+        .keypad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding-bottom: 10px; }
+
+        .btn {
+            height: var(--btn-size); border: 1px solid var(--border); background: var(--glass);
+            color: var(--text); font-size: 1.7rem; cursor: pointer; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            border-radius: var(--radius); clip-path: var(--clip);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-weight: 700;
+        }
+        .btn:active { transform: scale(0.9) translateY(4px); background: var(--glass-active); }
+        .btn.operator { color: var(--accent); font-weight: 900; }
+        .btn.ac-btn { background: rgba(255, 68, 68, 0.15); color: #ff4444; border-color: rgba(255, 68, 68, 0.3); }
+        .btn.equal { grid-column: span 2; background: var(--accent); color: #000; font-family: 'Orbitron', sans-serif; }
+        .util-label { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; margin-top: 2px; opacity: 0.7; }
+
+        /* --- OVERLAYS --- */
+        .drive-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 100; transform: translateY(100%); padding: 50px 25px; overflow-y: auto; visibility: hidden; color: white; }
+        .drive-panel.active { transform: translateY(0); visibility: visible; }
+        
+        .log-card { 
+            background: rgba(255,255,255,0.07); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-left: 5px solid var(--accent); 
+            animation: fadeIn 0.4s ease; 
+            position: relative; 
+            cursor: pointer;
+        }
+        .log-card:active { background: rgba(255,255,255,0.15); }
+        .log-card small { color: var(--accent); display: block; margin-bottom: 5px; font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .log-value-scroll { 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        .log-value-scroll::-webkit-scrollbar { display: none; } 
+        
+        .del-btn { position: absolute; right: 15px; top: 15px; background: none; border: none; color: #ff4444; font-size: 1.2rem; cursor: pointer; z-index: 10; }
+
+        .save-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 200; }
+        .modal-content { background: #fff; color: #000; width: 85%; padding: 30px; border-radius: 30px; text-align: center; }
+        .modal-content input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #eee; border-radius: 15px; font-size: 1.1rem; }
+
+        .clear-all-btn { background: #ff4444 !important; color: white !important; border: none !important; margin-bottom: 20px; width: 100%; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="temp-0 shape-soft">
+
+    <div id="welcome-splash">
+        <div class="splash-icon"><svg width="200" height="200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="4" y="2" width="16" height="20" rx="3" fill="#1B5E20" />
+  <rect x="6" y="4" width="12" height="4" rx="1" fill="#A5D6A7" />
+  <rect x="6" y="10" width="3" height="2" rx="0.5" fill="white" fill-opacity="0.8" />
+  <rect x="10.5" y="10" width="3" height="2" rx="0.5" fill="white" fill-opacity="0.8" />
+  <rect x="15" y="10" width="3" height="2" rx="0.5" fill="#FFC107" />
+  <rect x="6" y="13" width="3" height="2" rx="0.5" fill="white" fill-opacity="0.8" />
+  <rect x="10.5" y="13" width="3" height="2" rx="0.5" fill="white" fill-opacity="0.8" />
+  <rect x="15" y="13" width="3" height="2" rx="0.5" fill="#FFC107" />
+  <rect x="6" y="16" width="3" height="2" rx="0.5" fill="white" fill-opacity="0.8" />
+  <rect x="10.5" y="16" width="3" height="2" rx="0.5" fill="white" fill-opacity="0.8" />
+  <rect x="15" y="19" width="3" height="1" rx="0.5" fill="#FFC107" />
+  <rect x="6" y="19" width="7.5" height="1" rx="0.5" fill="white" fill-opacity="0.8" />
+</svg>
+</div>
+        <div class="splash-title">PREMIUM CALCULATOR</div>
+        <div class="splash-sub">By HashTech</div>
+        <div class="splash-dev">Designed by Syed Sakhir Hashmi</div>
+    </div>
+
+    <div class="app-container">
+        <div class="top-nav">
+            <div class="brand-logo">HashTech</div>
+            <button class="backspace-btn" onclick="sysBackspace()"><span>⌫</span> BACKSPACE</button>
+        </div>
+
+        <div class="screen-area">
+            <div id="video-container">
+                <video id="main-video-player" controls loop></video>
+            </div>
+            <div id="history-line"></div>
+            <div id="input-main">0</div>
+        </div>
+
+        <div class="keypad-wrapper">
+            <div class="keypad-grid">
+                <button class="btn ac-btn" onclick="sysAC()"><span>AC</span><span class="util-label">AutoSave</span></button>
+                <button class="btn" onclick="sysDrive('auto')"><span>📁</span><span class="util-label">History</span></button>
+                <button class="btn" onclick="sysDrive('title')"><span>⭐</span><span class="util-label">VIP</span></button>
+                <button class="btn operator" onclick="append('/')">÷</button>
+
+                <button class="btn" onclick="append('7')">7</button>
+                <button class="btn" onclick="append('8')">8</button>
+                <button class="btn" onclick="append('9')">9</button>
+                <button class="btn operator" onclick="append('*')">×</button>
+
+                <button class="btn" onclick="append('4')">4</button>
+                <button class="btn" onclick="append('5')">5</button>
+                <button class="btn" onclick="append('6')">6</button>
+                <button class="btn operator" onclick="append('-')">−</button>
+
+                <button class="btn" onclick="append('1')">1</button>
+                <button class="btn" onclick="append('2')">2</button>
+                <button class="btn" onclick="append('3')">3</button>
+                <button class="btn operator" onclick="append('+')">+</button>
+
+                <button class="btn" onclick="morphShape()"><span>💠</span><span class="util-label">Shape</span></button>
+                <button class="btn" onclick="append('0')">0</button>
+                <button class="btn" onclick="append('.')">.</button>
+                <button class="btn operator" onclick="triggerVideoUpload()" id="video-toggle-btn">
+                    <span id="vid-icon">🎬</span><span class="util-label" id="vid-label">Add Video</span>
+                </button>
+
+                <button class="btn" onclick="morphTemplate()"><span>🎨</span><span class="util-label">Theme</span></button>
+                <button class="btn" onclick="openLabeler()"><span>🔖</span><span class="util-label">Label</span></button>
+                <button class="btn equal" onclick="sysCalc()">=</button>
+            </div>
+        </div>
+
+        <input type="file" id="hidden-video-input" accept="video/*" style="display:none;" onchange="loadVideo(event)">
+
+        <div id="drive-auto" class="drive-panel">
+            <h1 style="margin-bottom:20px">Auto History</h1>
+            <button class="btn clear-all-btn" onclick="clearFullHistory('auto')">CLEAR ALL HISTORY</button>
+            <div id="auto-list"></div>
+            <button class="btn equal" style="width:100%; margin-top:20px; color:white; border:1px solid white" onclick="closeDrive()">Close</button>
+        </div>
+
+        <div id="drive-title" class="drive-panel">
+            <h1 style="margin-bottom:20px">VIP Drive</h1>
+            <button class="btn clear-all-btn" onclick="clearFullHistory('title')">CLEAR ALL VIP</button>
+            <div id="title-list"></div>
+            <button class="btn equal" style="width:100%; margin-top:20px; color:white; border:1px solid white" onclick="closeDrive()">Close</button>
+        </div>
+    </div>
+
+    <div id="vip-modal" class="save-modal">
+        <div class="modal-content">
+            <h2>Label Calculation</h2>
+            <input type="text" id="label-field" placeholder="Ex: Shop Bill V1">
+            <button class="btn equal" style="width:100%" onclick="confirmVIPSave()">Save to VIP</button>
+            <button onclick="document.getElementById('vip-modal').style.display='none'" style="margin-top:15px; background:none; border:none; cursor:pointer">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const mainDisp = document.getElementById('input-main');
+        const histDisp = document.getElementById('history-line');
+        const vidPlayer = document.getElementById('main-video-player');
+        const vidContainer = document.getElementById('video-container');
+        let currentFullVal = "";
+        let templateIdx = 0;
+        let shapeIdx = 1;
+
+        const templates = ['temp-0', 'temp-1', 'temp-2', 'temp-3', 'temp-4', 'temp-5', 'temp-6', 'temp-7'];
+        const shapes = ['shape-rect', 'shape-soft', 'shape-pill', 'shape-circle', 'shape-diamond', 'shape-cut'];
+
+        window.onload = function() {
+            setTimeout(() => {
+                const splash = document.getElementById('welcome-splash');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+            }, 1500);
+        };
+
+        function triggerVideoUpload() {
+            if(vidContainer.style.display === 'block') {
+                vidContainer.style.display = 'none';
+                vidPlayer.pause();
+                document.getElementById('vid-icon').innerText = "🎬";
+                document.getElementById('vid-label').innerText = "Add Video";
+            } else {
+                document.getElementById('hidden-video-input').click();
+            }
+        }
+
+        function loadVideo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                vidPlayer.src = url;
+                vidContainer.style.display = 'block';
+                vidPlayer.play();
+                document.getElementById('vid-icon').innerText = "❌";
+                document.getElementById('vid-label').innerText = "Remove";
+            }
+        }
+
+        function append(val) {
+            if (mainDisp.innerText === "0" || mainDisp.innerText === "Error") {
+                mainDisp.innerText = val;
+            } else {
+                mainDisp.innerText += val;
+            }
+            mainDisp.scrollTop = mainDisp.scrollHeight;
+        }
+
+        function sysBackspace() {
+            let val = mainDisp.innerText;
+            if (val.length > 1 && val !== "Error") {
+                mainDisp.innerText = val.slice(0, -1);
+            } else {
+                mainDisp.innerText = "0";
+            }
+        }
+
+        function sysCalc() {
+            let rawInput = mainDisp.innerText;
+            try {
+                let formatted = rawInput.replace(/×/g, '*').replace(/−/g, '-').replace(/÷/g, '/');
+                let result = eval(formatted);
+                if (!Number.isInteger(result)) result = parseFloat(result.toFixed(8));
+                histDisp.innerText = rawInput + " =";
+                mainDisp.innerText = result;
+                currentFullVal = rawInput + " = " + result;
+                mainDisp.scrollTop = 0;
+            } catch (e) {
+                mainDisp.innerText = "Error";
+            }
+        }
+
+        function sysAC() {
+            if (mainDisp.innerText !== "0" && mainDisp.innerText !== "Error" && currentFullVal !== "") {
+                saveToStorage('auto', 'Auto-Log', currentFullVal);
+            }
+            mainDisp.innerText = "0";
+            histDisp.innerText = "";
+            currentFullVal = "";
+        }
+
+        function saveToStorage(drive, label, value) {
+            const key = drive === 'auto' ? 'glass_auto_v3' : 'glass_vip_v3';
+            let db = JSON.parse(localStorage.getItem(key) || '[]');
+            db.unshift({
+                id: Date.now(), 
+                label: label,
+                value: value,
+                time: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString()
+            });
+            localStorage.setItem(key, JSON.stringify(db.slice(0, 30))); 
+        }
+
+        function deleteLog(type, id) {
+            const key = type === 'auto' ? 'glass_auto_v3' : 'glass_vip_v3';
+            let db = JSON.parse(localStorage.getItem(key) || '[]');
+            db = db.filter(item => item.id !== id);
+            localStorage.setItem(key, JSON.stringify(db));
+            sysDrive(type); 
+        }
+
+        function clearFullHistory(type) {
+            if(confirm("Are you sure you want to clear all records?")) {
+                const key = type === 'auto' ? 'glass_auto_v3' : 'glass_vip_v3';
+                localStorage.removeItem(key);
+                sysDrive(type);
+            }
+        }
+
+        function pasteToMain(val) {
+            let extract = val.includes('=') ? val.split('=')[1].trim() : val;
+            mainDisp.innerText = extract;
+            closeDrive();
+        }
+
+        function sysDrive(type) {
+            const panel = document.getElementById(`drive-${type}`);
+            const list = document.getElementById(`${type}-list`);
+            const key = type === 'auto' ? 'glass_auto_v3' : 'glass_vip_v3';
+            let db = JSON.parse(localStorage.getItem(key) || '[]');
+            
+            list.innerHTML = db.length ? db.map(item => `
+                <div class="log-card" onclick="pasteToMain('${item.value}')">
+                    <button class="del-btn" onclick="event.stopPropagation(); deleteLog('${type}', ${item.id})">✕</button>
+                    <small>${item.label} • ${item.date} ${item.time}</small>
+                    <div class="log-value-scroll">${item.value}</div>
+                </div>
+            `).join('') : '<p style="opacity:0.5; text-align:center">No records found.</p>';
+            
+            panel.classList.add('active');
+        }
+
+        function closeDrive() {
+            document.querySelectorAll('.drive-panel').forEach(p => p.classList.remove('active'));
+        }
+
+        function openLabeler() {
+            if (mainDisp.innerText === "0") return alert("Empty input!");
+            document.getElementById('vip-modal').style.display = 'flex';
+        }
+
+        function confirmVIPSave() {
+            const label = document.getElementById('label-field').value || "Unnamed VIP";
+            saveToStorage('title', label, currentFullVal || mainDisp.innerText);
+            document.getElementById('vip-modal').style.display = 'none';
+            document.getElementById('label-field').value = "";
+        }
+
+        function morphTemplate() {
+            document.body.classList.remove(...templates);
+            templateIdx = (templateIdx + 1) % templates.length;
+            document.body.classList.add(templates[templateIdx]);
+        }
+
+        function morphShape() {
+            document.body.classList.remove(...shapes);
+            shapeIdx = (shapeIdx + 1) % shapes.length;
+            document.body.classList.add(shapes[shapeIdx]);
+        }
+    </script>
+</body>
+</html>
