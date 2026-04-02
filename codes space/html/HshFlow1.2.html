@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HASH-CORE | SS HASHMI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { height: 100%; font-family: 'Share Tech Mono', monospace; overflow: hidden; background: #000; color: #00ff41; }
+        
+        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.12; pointer-events: none; }
+        #branding-container { position: fixed; z-index: 1; pointer-events: none; user-select: none; }
+        #random-letter { font-size: 25vw; font-weight: 900; color: rgba(0, 255, 65, 0.05); display: inline-block; transition: all 0.4s ease; }
+
+        /* Vault Sidebar */
+        #vault-sidebar {
+            position: fixed; left: -280px; top: 0; width: 260px; height: 100%;
+            background: rgba(0, 10, 0, 0.98); border-right: 1px solid #00ff41;
+            z-index: 200; transition: 0.4s; padding: 20px; overflow-y: auto;
+            box-shadow: 5px 0 15px rgba(0, 255, 65, 0.2);
+        }
+        #vault-sidebar.open { left: 0; }
+        .vault-header { font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #00ff41; padding-bottom: 5px; display: flex; justify-content: space-between; }
+        .code-card { background: rgba(0, 40, 0, 0.4); border: 1px solid #00ff41; padding: 10px; margin-bottom: 12px; border-radius: 4px; cursor: pointer; position: relative; }
+        .card-name { font-weight: bold; font-size: 13px; color: #00e5ff; display: block; margin-bottom: 4px; }
+        .card-preview { font-size: 9px; color: #88ff88; overflow: hidden; height: 25px; opacity: 0.7; }
+        .card-del { position: absolute; right: 5px; top: 2px; color: #ff3e3e; font-size: 16px; padding: 5px; }
+
+        /* Overlay */
+        #vault-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 190; display: none; }
+
+        /* Search Bar */
+        #search-container {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(0, 15, 0, 0.98); border: 1px solid #00ff41;
+            padding: 8px; z-index: 100; transition: 0.4s; display: flex; gap: 5px;
+        }
+        #search-container.active { top: 0; }
+        #search-input { flex: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 8px; outline: none; font-size: 14px; font-family: 'Share Tech Mono'; }
+
+        /* Editor Area with Line Numbers Integration */
+        #editor-wrapper { display: flex; height: 100vh; position: relative; z-index: 5; }
+        
+        #line-numbers {
+            width: 45px; background: #000; border-right: 1px solid #004411;
+            color: #006622; font-size: 14px; line-height: 1.5;
+            padding: 20px 5px; text-align: right; user-select: none;
+            overflow: hidden; pointer-events: none;
+        }
+
+        #editor-container { flex: 1; position: relative; overflow: hidden; }
+        #html-code, #highlight-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px; font-size: 14px; line-height: 1.5;
+            white-space: pre; overflow-x: auto;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        #html-code { background: transparent; color: transparent; caret-color: #00ff41; border: none; outline: none; resize: none; z-index: 10; }
+        #highlight-layer { color: #00ff41; pointer-events: none; z-index: 9; }
+
+        /* New Edit Mode Toggle Button */
+        #edit-mode-toggle {
+            position: absolute; top: 5px; right: 20px; z-index: 100;
+            padding: 4px 8px; font-size: 10px; color: #00ff41;
+            background: rgba(0, 40, 0, 0.8); border: 1px solid #00ff41;
+            border-radius: 4px; cursor: pointer;
+        }
+        #edit-mode-toggle.active { background: #00ff41; color: #000; box-shadow: 0 0 10px #00ff41; }
+
+        /* Auto-Suggestion Box */
+        #suggestion-box {
+            position: absolute; background: #000; border: 1px solid #00ff41;
+            color: #00ff41; z-index: 1000; display: none; min-width: 180px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4); border-radius: 4px;
+        }
+        .suggestion-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #003300; font-size: 12px; }
+        .suggestion-item:hover { background: #00ff41; color: #000; }
+
+        /* Syntax Color */
+        .tag { color: #00e5ff; } .attr { color: #ff00ff; } .val { color: #ffff00; }
+        .find-match { background: rgba(0, 255, 65, 0.3); }
+        .active-match { background: #ffff00 !important; color: #000 !important; }
+
+        /* Bottom Controls */
+        .side-controls { position: fixed; bottom: 20px; left: 20px; z-index: 150; display: flex; gap: 8px; }
+        .controls { position: fixed; bottom: 20px; right: 20px; z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        
+        #lang-select { background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 5px; font-family: 'Share Tech Mono'; font-size: 12px; outline: none; border-radius: 4px; }
+        .action-btn { width: 45px; height: 45px; border-radius: 50%; background: #000; border: 1px solid #00ff41; color: #00ff41; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+        /* Preview / Output Window */
+        #preview-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; z-index: 1000; }
+        #output-console { position: fixed; bottom: 0; left: 0; width: 100%; height: 50%; background: #050505; color: #00ff41; display: none; z-index: 1000; border-top: 2px solid #00ff41; padding: 20px; overflow-y: auto; }
+        .console-header { display: flex; justify-content: space-between; border-bottom: 1px solid #00ff41; padding-bottom: 5px; margin-bottom: 10px; font-weight: bold; }
+        
+        iframe { width: 100%; height: 100%; border: none; }
+        .preview-ui { position: fixed; left: 0; top: 40%; z-index: 1001; display: flex; flex-direction: column; gap: 8px; padding: 5px; background: rgba(0,0,0,0.8); border-radius: 0 8px 8px 0; transition: 0.3s; }
+        .p-btn { padding: 10px; cursor: pointer; font-size: 11px; font-family: 'Share Tech Mono'; color: #00ff41; background: #000; border: 1px solid #00ff41; border-radius: 4px; outline: none; }
+        #loading { display: none; color: #ffff00; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+<div id="branding-container"><div id="random-letter"></div></div>
+<div id="vault-overlay" onclick="toggleVault()"></div>
+
+<div id="vault-sidebar">
+    <div class="vault-header"><span>VAULT</span><span style="cursor:pointer" onclick="toggleVault()">×</span></div>
+    <div id="vault-list"></div>
+</div>
+
+<div id="search-container">
+    <input type="text" id="search-input" placeholder="SEARCH..." oninput="handleInput()">
+    <button class="p-btn" onclick="scrollToNextMatch()">NEXT</button>
+</div>
+
+<div id="editor-wrapper">
+    <div id="line-numbers">1</div>
+    <div id="editor-container">
+        <button id="edit-mode-toggle" onclick="toggleEditMode()">RAW MODE: OFF</button>
+        <div id="highlight-layer"></div>
+        <textarea id="html-code" placeholder="[SYSTEM READY...]" spellcheck="false" oninput="handleInput()" onscroll="syncScroll()"></textarea>
+        <div id="suggestion-box"></div>
+    </div>
+</div>
+
+<div id="preview-container">
+    <div class="preview-ui" id="preview-nav">
+        <button class="p-btn" id="hide-toggle-btn" onclick="toggleInterface()">Hide</button>
+        <button class="p-btn term-btn" style="color:#ff3e3e; border-color:#ff3e3e" onclick="terminatePreview()">Term</button>
+    </div>
+    <iframe id="preview-window"></iframe>
+</div>
+
+<div id="output-console">
+    <div class="console-header">
+        <span>CONSOLE OUTPUT</span>
+        <span style="cursor:pointer; color: #ff3e3e;" onclick="closeConsole()">[X] CLOSE</span>
+    </div>
+    <pre id="output-text">Compiling...</pre>
+</div>
+
+<div class="side-controls">
+    <button class="action-btn" onclick="toggleVault()">📁</button>
+    <button class="action-btn" onclick="toggleSearch()">🔍</button>
+    <button class="action-btn" style="color:#00e5ff; border-color:#00e5ff" onclick="saveToVault()">💾</button>
+    <button class="action-btn" style="color:#ff3e3e; border-color:#ff3e3e" onclick="clearTerminal()">🗑️</button>
+</div>
+
+<div class="controls">
+    <div id="loading">EXECUTING...</div>
+    <select id="lang-select">
+        <option value="web">WEB (HTML/CSS/JS)</option>
+        <option value="python">PYTHON 3</option>
+        <option value="javascript">JAVASCRIPT (Node.js)</option>
+        <option value="php">PHP</option>
+        <option value="c++">C++</option>
+        <option value="java">JAVA</option>
+    </select>
+    <button class="p-btn" style="padding:12px 20px; font-weight:bold; border-width: 2px;" onclick="executeCode()">RUN CODE</button>
+</div>
+
+<script>
+    let currentMatchIndex = -1;
+    let rawMode = false;
+    const codeArea = document.getElementById("html-code");
+    const highlightLayer = document.getElementById("highlight-layer");
+    const lineNumbers = document.getElementById("line-numbers");
+    const suggestionBox = document.getElementById("suggestion-box");
+    const searchInput = document.getElementById("search-input");
+    const langSelect = document.getElementById("lang-select");
+    const editToggle = document.getElementById("edit-mode-toggle");
+
+    const suggestionsDict = {
+        python: ["print()", "input()", "len()", "range()", "math.sqrt()", "math.pi", "math.sin()", "import math", "def function():", "if __name__ == '__main__':", "for i in range():", "class MyClass:"],
+        web: ["<div class=''></div>", "<span id=''></span>", "document.getElementById('')", "console.log()", "display: flex;", "margin: 0 auto;", "background-color:", "addEventListener('', () => {})"],
+        javascript: ["console.log()", "async function", "await fetch()", "JSON.stringify()", "setTimeout(() => {}, 1000)", "const", "let", "return"]
+    };
+
+    // Matrix Logic
+    const canvas = document.getElementById('matrix-bg');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const drops = Array(Math.floor(canvas.width / 20)).fill(1);
+    function drawMatrix() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0F0"; ctx.font = "14px monospace";
+        drops.forEach((y, i) => {
+            ctx.fillText(Math.floor(Math.random()*2), i * 20, y * 20);
+            if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(drawMatrix, 50);
+
+    const brandingName = "SS HASHMI"; let nIdx = 0;
+    function moveBranding() {
+        const div = document.getElementById("random-letter");
+        const cont = document.getElementById("branding-container");
+        cont.style.left = Math.random()*(window.innerWidth-100)+"px";
+        cont.style.top = Math.random()*(window.innerHeight-100)+"px";
+        div.textContent = brandingName[nIdx];
+        nIdx = (nIdx+1)%brandingName.length;
+        setTimeout(moveBranding, 2000);
+    }
+    moveBranding();
+
+    function toggleEditMode() {
+        rawMode = !rawMode;
+        if(rawMode) {
+            highlightLayer.style.display = "none";
+            codeArea.style.color = "#00ff41";
+            editToggle.innerText = "RAW MODE: ON";
+            editToggle.classList.add("active");
+        } else {
+            highlightLayer.style.display = "block";
+            codeArea.style.color = "transparent";
+            editToggle.innerText = "RAW MODE: OFF";
+            editToggle.classList.remove("active");
+            handleInput();
+        }
+    }
+
+    function handleInput() {
+        const lines = codeArea.value.split('\n').length;
+        lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+
+        if(!rawMode) {
+            let code = codeArea.value;
+            const term = searchInput.value;
+            code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            code = code.replace(/(&lt;[\/?[a-z0-9]+)(&gt;|\s)/gi, '<span class="tag">$1</span>$2');
+            code = code.replace(/([a-z-]+)=/gi, '<span class="attr">$1</span>=');
+            code = code.replace(/"(.*?)"/g, '<span class="val">"$1"</span>');
+            
+            if (term && term.length > 0) {
+                const regex = new RegExp(`(${term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, "gi");
+                let mCount = 0;
+                code = code.replace(regex, (m) => `<span class="find-match" id="m-${mCount++}">${m}</span>`);
+            }
+            highlightLayer.innerHTML = code;
+        }
+
+        triggerSuggestions();
+        syncScroll();
+    }
+
+    function triggerSuggestions() {
+        const val = codeArea.value;
+        const cursorPos = codeArea.selectionStart;
+        const lastWord = val.substring(0, cursorPos).split(/[\s\n.()]+/).pop().toLowerCase();
+        if (lastWord.length < 2) { suggestionBox.style.display = "none"; return; }
+        let currentLang = langSelect.value === 'web' ? 'web' : (langSelect.value === 'python' ? 'python' : 'javascript');
+        const matches = (suggestionsDict[currentLang] || []).filter(s => s.toLowerCase().includes(lastWord));
+        if (matches.length > 0) {
+            suggestionBox.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="applySuggest('${m}')">${m}</div>`).join('');
+            suggestionBox.style.display = "block";
+            suggestionBox.style.left = "60px";
+            suggestionBox.style.top = "100px";
+        } else {
+            suggestionBox.style.display = "none";
+        }
+    }
+
+    function applySuggest(word) {
+        const val = codeArea.value;
+        const cursorPos = codeArea.selectionStart;
+        const words = val.substring(0, cursorPos).split(/[\s\n.()]+/);
+        const lastWord = words.pop();
+        const before = val.substring(0, cursorPos - lastWord.length);
+        const after = val.substring(cursorPos);
+        codeArea.value = before + word + after;
+        suggestionBox.style.display = "none";
+        handleInput();
+        codeArea.focus();
+    }
+
+    async function executeCode() {
+        const lang = langSelect.value;
+        const code = codeArea.value;
+        if (lang === "web") showWebPreview();
+        else runViaAPI(lang, code);
+    }
+
+    async function runViaAPI(lang, code) {
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("output-console").style.display = "block";
+        const outputText = document.getElementById("output-text");
+        outputText.innerText = "System: Requesting server...\n";
+        const languageMap = {
+            "python": { name: "python", version: "3.10.0" },
+            "javascript": { name: "javascript", version: "18.15.0" },
+            "php": { name: "php", version: "8.2.3" },
+            "c++": { name: "c++", version: "10.2.0" },
+            "java": { name: "java", version: "15.0.2" }
+        };
+        try {
+            const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+                method: "POST",
+                body: JSON.stringify({
+                    language: languageMap[lang].name,
+                    version: languageMap[lang].version,
+                    files: [{ content: code }]
+                })
+            });
+            const data = await response.json();
+            document.getElementById("loading").style.display = "none";
+            if (data.run) {
+                outputText.innerText = data.run.output || "Execution finished (No output)";
+                outputText.style.color = data.run.stderr ? "#ff3e3e" : "#00ff41";
+            }
+        } catch (err) {
+            document.getElementById("loading").style.display = "none";
+            outputText.innerText = "Fatal Error: Connection failed.";
+        }
+    }
+
+    function showWebPreview() {
+        const doc = document.getElementById("preview-window").contentWindow.document;
+        doc.open(); doc.write(codeArea.value); doc.close();
+        document.getElementById("preview-container").style.display = "block";
+    }
+
+    function syncScroll() { 
+        highlightLayer.scrollTop = codeArea.scrollTop; 
+        highlightLayer.scrollLeft = codeArea.scrollLeft;
+        lineNumbers.scrollTop = codeArea.scrollTop;
+    }
+    
+    function closeConsole() { document.getElementById("output-console").style.display = "none"; }
+    function toggleVault() {
+        const s = document.getElementById("vault-sidebar");
+        const o = document.getElementById("vault-overlay");
+        s.classList.toggle('open');
+        o.style.display = s.classList.contains('open') ? 'block' : 'none';
+    }
+    function toggleSearch() { document.getElementById("search-container").classList.toggle('active'); }
+    function toggleInterface() {
+        const nav = document.getElementById("preview-nav");
+        const btn = document.getElementById("hide-toggle-btn");
+        nav.classList.toggle('minimized');
+        btn.innerText = nav.classList.contains('minimized') ? "Show" : "Hide";
+    }
+    function terminatePreview() { document.getElementById("preview-container").style.display = "none"; }
+    function clearTerminal() { if(confirm("WIPE?")) { codeArea.value=""; handleInput(); } }
+
+    function saveToVault() {
+        const code = codeArea.value.trim();
+        if(!code) return;
+        const name = prompt("Enter Code Name:", "Module " + new Date().toLocaleTimeString());
+        if(!name) return;
+        let v = JSON.parse(localStorage.getItem('terminal_v') || '[]');
+        v.unshift({id: Date.now(), n: name, c: code});
+        localStorage.setItem('terminal_v', JSON.stringify(v.slice(0,20)));
+        renderVault();
+    }
+
+    function renderVault() {
+        const v = JSON.parse(localStorage.getItem('terminal_v') || '[]');
+        document.getElementById('vault-list').innerHTML = v.map(i => `
+            <div class="code-card" onclick="loadCore('${i.id}')">
+                <span class="card-del" onclick="delCore(event,'${i.id}')">×</span>
+                <span class="card-name">${i.n}</span>
+                <div class="card-preview">${i.c.substring(0,60).replace(/</g,'&lt;')}...</div>
+            </div>`).join('');
+    }
+
+    function loadCore(id) {
+        const v = JSON.parse(localStorage.getItem('terminal_v') || '[]');
+        const item = v.find(x => x.id == id);
+        if(item) { codeArea.value = item.c; handleInput(); toggleVault(); }
+    }
+
+    function delCore(e, id) {
+        e.stopPropagation();
+        if(!confirm("Delete?")) return;
+        let v = JSON.parse(localStorage.getItem('terminal_v') || '[]');
+        v = v.filter(x => x.id != id);
+        localStorage.setItem('terminal_v', JSON.stringify(v));
+        renderVault();
+    }
+    
+    function scrollToNextMatch() {
+        const matches = document.querySelectorAll('.find-match');
+        if (matches.length === 0) return;
+        currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+        document.querySelectorAll('.find-match').forEach(m => m.classList.remove('active-match'));
+        const target = document.getElementById(`m-${currentMatchIndex}`);
+        if (target) {
+            target.classList.add('active-match');
+            codeArea.scrollTo({ top: target.offsetTop - 100, behavior: 'smooth' });
+        }
+    }
+
+    renderVault();
+    handleInput();
+</script>
+</body>
+</html>
