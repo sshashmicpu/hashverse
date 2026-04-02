@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maqsood ul Quran App - HashTech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            /* Purple & Light Blue Theme */
+            --primary-blue: #00d2ff;
+            --primary-purple: #9d50bb;
+            --bg-dark: #050505;
+            --panel-bg: rgba(30, 20, 50, 0.95);
+            --text-light: #f0f0f0;
+            --accent-blur: blur(25px);
+            --gold-alt: #FFD700;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* --- SPLASH SCREEN STYLES --- */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a0b2e 0%, #050505 100%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: opacity 1s ease-out;
+        }
+
+      .bismillah {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 28px;
+    color: var(--gold-alt);
+    margin-top: -200px;   /* Isay -120 se barha kar -200 kar diya taake ye bilkul top par chali jaye */
+    margin-bottom: 15px;  /* Title ke darmiyan gap mazeed kam kar diya */
+}
+
+.app-title {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 32px;
+    background: linear-gradient(to right, var(--primary-blue), var(--primary-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    margin-top: -5px;     /* Title ko Bismillah ke kareeb rakha */
+    margin-bottom: 8px;   /* Sub-title ke darmiyan gap mazeed kam kiya */
+}
+
+.sub-heading {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 18px;
+    color: var(--primary-blue);
+    margin-top: -5px; 
+    margin-bottom: 25px;  /* Intro box se fasla bhi kam kar diya */
+}
+
+        .intro-box {
+            font-family: 'Amiri', serif; /* Amiri font for intro as requested */
+            font-size: 16px;
+            line-height: 1.8;
+            color: #ddd;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            margin-bottom: 25px;
+            direction: rtl;
+        }
+
+        .credits {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .loading-msg {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+            color: var(--primary-blue);
+            letter-spacing: 2px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .dev-footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* --- EXISTING STYLES (NO CHANGES) --- */
+        .edge-border {
+            position: fixed;
+            z-index: 9998;
+            pointer-events: none;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--primary-purple));
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+        }
+        .border-top { top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(to right, var(--primary-blue), var(--primary-purple), var(--primary-blue)); }
+        .border-left { top: 0; left: 0; width: 5px; height: 100%; }
+        .border-right { top: 0; right: 0; width: 5px; height: 100%; }
+
+        #fast-scroller-container {
+            position: fixed; right: 15px; 
+            top: 20px; 
+            bottom: 180px; 
+            width: 35px; z-index: 5000; display: flex; align-items: center;
+            justify-content: center; touch-action: none;
+            transition: opacity 0.5s ease;
+        }
+        #scroller-track { width: 4px; height: 100%; background: rgba(255, 255, 255, 0.1); border-radius: 10px; position: relative; }
+        #scroller-thumb {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            width: 32px; height: 50px; 
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); cursor: pointer; color: white; font-weight: bold;
+        }
+        #scroller-bubble {
+            position: absolute; right: 45px; background: var(--primary-blue);
+            color: black; padding: 5px 12px; border-radius: 8px; font-weight: bold;
+            display: none; box-shadow: 0 0 10px rgba(0,0,0,0.5); font-size: 14px;
+        }
+
+        .bottom-panel {
+    position: fixed; 
+    bottom: 3px;             /* Nichly khali jagah (gap) khatam karne ke liye */
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 89%;              /* Panel ki chaurai thodi barha di */
+    max-width: 440px; 
+    
+    /* VERTICAL HEIGHT BARHANE KE LIYE */
+    min-height: 140px;       /* Is se panel vertically lamba (tall) ho jaye ga */
+    padding: 20px 15px 35px 15px; /* Andar ki space mazeed barha di */
+    
+    background: var(--panel-bg); 
+    backdrop-filter: var(--accent-blur);
+    -webkit-backdrop-filter: var(--accent-blur);
+    
+    /* Nichly konay 0 kar diye taake screen se bilkul chipak jaye */
+    border-radius: 30px 30px 0 0; 
+    
+    z-index: 2000;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid transparent;
+    animation: borderRotate 4s linear infinite;
+    
+    /* Buttons ko vertically center ya adjust karne ke liye */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+        @keyframes borderRotate {
+            0% { border-color: #00d2ff; box-shadow: 0 0 15px #00d2ff; }
+            33% { border-color: #9d50bb; box-shadow: 0 0 15px #9d50bb; }
+            66% { border-color: #00ff88; box-shadow: 0 0 15px #00ff88; }
+            100% { border-color: #00d2ff; box-shadow: 0 0 15px #00d2ff; }
+        }
+
+        .panel-hidden { transform: translate(-50%, 150%); opacity: 0; pointer-events: none; }
+
+        #unhide-btn {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 3001; background: linear-gradient(to right, var(--primary-blue), var(--primary-purple)); 
+            color: white; border: none; border-radius: 50px; padding: 12px 25px;
+            font-weight: bold; cursor: pointer; display: none; font-size: 14px;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+        }
+
+        #offline-pointer {
+            position: fixed; bottom: 70px; right: 25px;
+            z-index: 4000; display: none;
+            color: var(--primary-blue); text-align: center;
+            animation: bounceArrow 1.5s infinite;
+        }
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .arrow-text { font-size: 10px; font-weight: bold; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 5px; border: 1px solid var(--primary-blue); }
+
+        .status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px; }
+        .render-info { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(0, 210, 255, 0.2); }
+        .label-text { font-size: 9px; color: var(--primary-blue); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; display: block; }
+        
+        #render-progress-bar { width: 50px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+        #render-fill { width: 0%; height: 100%; background: var(--primary-blue); }
+
+        .control-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: center; }
+
+        button {
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 8px; border-radius: 12px; cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+        }
+        button:active { transform: scale(0.95); background: rgba(157, 80, 187, 0.3); }
+        button span { font-size: 10px; font-weight: 600; opacity: 0.9; margin-top: 2px; }
+
+        .go-input-box { display: flex; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid var(--primary-purple); overflow: hidden; }
+        .go-input { width: 40px; border: none; background: none; color: white; text-align: center; font-weight: bold; outline: none; padding: 5px; }
+        .go-btn { background: var(--primary-purple); color: white; border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; font-size: 11px; }
+
+        #viewer-container {
+            position: absolute; top: 0; bottom: 0; left: 0; width: 100%;
+            overflow-y: auto; scroll-behavior: auto; scrollbar-width: none;
+            background: #111; z-index: 1;
+        }
+        #viewer-container::-webkit-scrollbar { display: none; }
+        #pdf-render-container { display: flex; flex-direction: column; align-items: center; padding-bottom: 220px; }
+
+        .page-slot {
+            width: 98%; max-width: 800px; min-height: 550px;
+            margin-bottom: 12px; border-radius: 4px; 
+            background: #1a1a1a; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4); overflow: hidden;
+        }
+
+        canvas { width: 100% !important; height: auto !important; }
+
+        #loader-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; z-index: 9999; text-align: center;
+            background: rgba(15, 10, 25, 0.98); 
+            padding: 20px 20px; border-radius: 28px;
+            border: 2px solid var(--primary-blue); 
+            backdrop-filter: blur(20px);
+            width: 75%; max-width: 350px;
+            box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 15px rgba(0, 210, 255, 0.2);
+            direction: rtl;
+            font-family: 'Noto Nastaliq Urdu', serif;
+            display: none; /* Hidden by default, shown via script if needed */
+        }
+    </style>
+</head>
+<body onclick="showControls()">
+
+<div id="splash-screen">
+    <div class="bismillah">بِسْمِ اللہِ الرَّحْمٰنِ الرَّحِیْمِ</div>
+    <div class="app-title">مقصود القرآن ایپ</div>
+    <div class="sub-heading">ترجمۃالکتاب الرحمٰن</div>
+    
+    <div class="intro-box">
+        <b>تعارف و خصوصیات:</b><br>
+        خالص،فرقہ واریت سے پاک آسان ترین و دلکش ترجمۂ قرآن۔ مستند ترجمہ، بہترین گرافکس اور آف لائن پڑھنے کی سہولت موجود ہے۔<br>
+        <b>مقصد:</b> قرآن کریم کے پیغام کو ہر انسان تک پہنچانا۔<br>
+        <b>ضروری گائیڈ:</b> سکرولنگ کے لیے پلس اورپلے بٹن دبائیں اور آف لائن مطالعہ کرنے کے لیے سیو بٹن کا انتخاب کریں۔
+    </div>
+
+    <div class="credits">پیشکش: سید ساخر ہاشمی</div>
+    <div class="loading-msg">LOADING APPLICATION...</div>
+    <div class="dev-footer">App Developed by HashTech</div>
+</div>
+
+<div class="edge-border border-top"></div>
+<div class="edge-border border-left"></div>
+<div class="edge-border border-right"></div>
+
+<div id="loader-msg">
+    <div class="urdu-title">السلام علیکم و رحمتہ اللہ</div>
+    <div class="urdu-text">
+        مقصود القرآن ایپ میں خوش آمدید!<br>
+        • قرآن پاک <b>OFFLINE</b> محفوظ کریں۔<br>
+    </div>
+    <div class="credit-footer">Presented by HashTech by Syed Sakhir Hashmi</div>
+</div>
+
+<div id="fast-scroller-container">
+    <div id="scroller-track">
+        <div id="scroller-bubble">1</div>
+        <div id="scroller-thumb">|||</div>
+    </div>
+</div>
+
+<button id="unhide-btn" onclick="toggleControlPanel()">📂 SHOW CONTROLS </button>
+
+<div id="offline-pointer">
+    <div class="arrow-text">Download for Offline</div>
+    <div style="font-size: 25px;">↓</div>
+</div>
+
+<div class="bottom-panel" id="main-panel">
+    <div class="status-row">
+        <div>
+            <span class="label-text">Time Spent</span>
+            <span id="stopwatch" style="color:var(--primary-blue); font-family:monospace; font-weight: bold;">00:00:00</span>
+        </div>
+        <div class="render-info">
+            <div>
+                <span class="label-text" id="render-label">Memory Save</span>
+                <div id="render-progress-bar"><div id="render-fill" style="width:100%"></div></div>
+            </div>
+            <span id="render-count" style="font-size: 10px; color: var(--primary-blue); font-family: monospace;">Smart</span>
+        </div>
+        <div style="text-align: right;">
+            <span class="label-text">Page No</span>
+            <span id="page-label" style="color:var(--primary-blue); font-weight:bold;">1</span>
+        </div>
+    </div>
+
+    <div class="control-grid">
+        <div style="display:flex; gap:5px;">
+            <button onclick="toggleDarkMode()">🌓<span>DARK</span></button>
+            <button onclick="adjustDimmer()">🌙<span>DIM</span></button>
+        </div>
+        
+        <div class="go-input-box">
+            <input type="number" id="go-to-input" class="go-input" placeholder="0">
+            <button class="go-btn" onclick="goToPage(document.getElementById('go-to-input').value)">GO</button>
+        </div>
+
+        <div style="display:flex; gap:5px; justify-content: flex-end;">
+            <button onclick="setAlert()">⏰<span>ALERT</span></button>
+            <button onclick="toggleControlPanel()" style="color:#ff4757; border-color: rgba(255,71,87,0.3);">✖<span>HIDE</span></button>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 8px;">
+        <div style="display:flex; align-items:center; background: rgba(0,0,0,0.5); padding: 5px 12px; border-radius: 15px; border: 1px solid rgba(0, 210, 255, 0.2); flex-grow: 1; justify-content: center; gap: 8px;">
+            <button onclick="goToPage(currentPage - 1)" style="background:none; border:none; padding:0; font-size: 10px; color:white;">◀ PREV</button>
+            <button onclick="changeSpeed(-0.05)" style="background:none; border:none; padding:0;">➖</button>
+            <button id="play-pause-btn" onclick="togglePlayPause()" style="color:var(--primary-blue); font-size:18px; background:none; border:none; padding:0;">▶</button>
+            <span id="speed-val" style="color:var(--primary-blue); min-width:20px; text-align:center; font-weight:bold; font-size: 13px;">0.2</span>
+            <button onclick="changeSpeed(0.05)" style="background:none; border:none; padding:0;">➕</button>
+            <button onclick="goToPage(currentPage + 1)" style="background:none; border:none; padding:0; font-size: 10px; color:white;">NEXT ▶</button>
+        </div>
+        <button id="save-btn" onclick="saveForOffline()" style="background: linear-gradient(45deg, var(--primary-blue), var(--primary-purple)); border:none; font-weight: bold; min-width: 80px;">💾<span>OFFLINE</span></button>
+    </div>
+</div>
+
+<div id="viewer-container" onscroll="trackProgress()">
+    <div id="pdf-render-container"></div>
+</div>
+
+<script>
+    const CACHE_NAME = 'maqsood-quran-final';
+    const pdfUrl = 'https://raw.githubusercontent.com/sshashmicpu/maqsoodulquran/main/maqsood%20ul%20Quran%20Urdu%20by%20SS%20HASHMI.pdf';
+    
+    let pdfDoc = null, currentPage = 1, autoScrollSpeed = 0.2, isPlaying = false, dimLevel = 0;
+    let scrollRequest = null, scrollerTimer = null;
+    let scrollAccumulator = 0;
+
+    const scroller = document.getElementById('fast-scroller-container');
+    const thumb = document.getElementById('scroller-thumb');
+    const track = document.getElementById('scroller-track');
+    const bubble = document.getElementById('scroller-bubble');
+    const viewer = document.getElementById('viewer-container');
+    const renderContainer = document.getElementById('pdf-render-container');
+    const pointer = document.getElementById('offline-pointer');
+    const splash = document.getElementById('splash-screen');
+
+    // Splash Screen Timer (5 Seconds)
+    setTimeout(() => {
+        splash.style.opacity = '0';
+        setTimeout(() => splash.style.display = 'none', 1000);
+    }, 5000);
+
+    const pageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const pageNum = parseInt(entry.target.dataset.page);
+            if (entry.isIntersecting) {
+                renderPage(pageNum, entry.target);
+            } else {
+                entry.target.innerHTML = `<span style="color:#333; font-size:12px;">Maqsood ul Quran - Page ${pageNum}</span>`;
+                entry.target.removeAttribute('data-rendered');
+            }
+        });
+    }, { root: viewer, rootMargin: '600px 0px', threshold: 0.1 });
+
+    function showControls() {
+        scroller.style.opacity = "1";
+        clearTimeout(scrollerTimer);
+        scrollerTimer = setTimeout(() => {
+            if(!isPlaying) scroller.style.opacity = "0";
+        }, 3000);
+    }
+
+    function handleScroller(e) {
+        showControls();
+        const rect = track.getBoundingClientRect();
+        const touchY = e.touches ? e.touches[0].clientY : e.clientY;
+        let pos = (touchY - rect.top) / rect.height;
+        pos = Math.max(0, Math.min(1, pos));
+        thumb.style.top = (pos * 100) + '%';
+        if (pdfDoc) {
+            const targetPage = Math.ceil(pos * pdfDoc.numPages) || 1;
+            bubble.innerText = targetPage;
+            bubble.style.display = 'block';
+            bubble.style.top = (pos * 100) + '%';
+            const targetEl = document.getElementById('slot-' + targetPage);
+            if (targetEl) viewer.scrollTop = targetEl.offsetTop;
+        }
+    }
+
+    thumb.addEventListener('touchmove', (e) => { e.preventDefault(); handleScroller(e); });
+    thumb.addEventListener('touchend', () => bubble.style.display = 'none');
+
+    async function checkOfflineStatus() {
+        const cache = await caches.open(CACHE_NAME);
+        const saved = await cache.match(pdfUrl);
+        if(saved) {
+            document.getElementById('save-btn').innerHTML = "✅<span>SAVED</span>";
+            pointer.style.display = "none"; 
+            return true;
+        } else {
+            pointer.style.display = "block"; 
+            return false;
+        }
+    }
+
+    async function saveForOffline() {
+        const btn = document.getElementById('save-btn');
+        btn.innerHTML = "...<span>WAIT</span>";
+        pointer.style.display = "none"; 
+        try {
+            const response = await fetch(pdfUrl);
+            if (!response.ok) throw new Error('Network error');
+            const blob = await response.blob();
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(pdfUrl, new Response(blob));
+            btn.innerHTML = "✅<span>SAVED</span>";
+        } catch (e) { 
+            btn.innerHTML = "💾<span>RETRY</span>"; 
+            pointer.style.display = "block"; 
+        }
+    }
+
+    async function initPDF() {
+        const isSaved = await checkOfflineStatus();
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        try {
+            let data;
+            if (isSaved) {
+                const cache = await caches.open(CACHE_NAME);
+                const response = await cache.match(pdfUrl);
+                data = await response.arrayBuffer();
+            } else {
+                data = pdfUrl;
+            }
+            pdfDoc = await pdfjsLib.getDocument(data).promise;
+            const total = pdfDoc.numPages;
+            for (let i = 1; i <= total; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'page-slot';
+                slot.id = 'slot-' + i;
+                slot.dataset.page = i;
+                slot.innerHTML = `<span style="color:#333; font-size:12px;">Maqsood ul Quran - Page ${i}</span>`;
+                renderContainer.appendChild(slot);
+                pageObserver.observe(slot);
+            }
+            if(localStorage.getItem('lastSeenPage')) goToPage(localStorage.getItem('lastSeenPage'));
+        } catch (err) { console.error("PDF Load Error"); }
+    }
+
+    async function renderPage(num, target) {
+        if (target.dataset.rendered === 'true') return;
+        target.dataset.rendered = 'true';
+        const page = await pdfDoc.getPage(num);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.height = viewport.height; canvas.width = viewport.width;
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        target.innerHTML = '';
+        target.appendChild(canvas);
+    }
+
+    function goToPage(num) {
+        const n = parseInt(num);
+        if(!n || n < 1 || (pdfDoc && n > pdfDoc.numPages)) return;
+        const el = document.getElementById('slot-' + n);
+        if(el) { viewer.scrollTop = el.offsetTop; currentPage = n; updateUI(); }
+    }
+
+    function updateUI() {
+        document.getElementById('page-label').innerText = currentPage;
+        localStorage.setItem('lastSeenPage', currentPage);
+        if (pdfDoc) {
+            const pos = (currentPage / pdfDoc.numPages) * 100;
+            thumb.style.top = pos + '%';
+        }
+    }
+
+    function trackProgress() {
+        showControls();
+        const slots = document.querySelectorAll('.page-slot');
+        slots.forEach((div) => {
+            const rect = div.getBoundingClientRect();
+            if(rect.top >= 0 && rect.top < 400) { 
+                currentPage = parseInt(div.dataset.page); 
+                updateUI(); 
+            }
+        });
+    }
+
+    function toggleControlPanel() {
+        const panel = document.getElementById('main-panel');
+        const unhideBtn = document.getElementById('unhide-btn');
+        const isHidden = panel.classList.toggle('panel-hidden');
+        unhideBtn.style.display = isHidden ? 'block' : 'none';
+        if(isHidden) pointer.style.display = "none"; 
+        else if(document.getElementById('save-btn').innerText.includes('OFFLINE')) pointer.style.display = "block";
+    }
+
+    function smoothScrollLoop() {
+        if (!isPlaying) return;
+        scrollAccumulator += autoScrollSpeed;
+        if (scrollAccumulator >= 1) {
+            const movePixels = Math.floor(scrollAccumulator);
+            viewer.scrollTop += movePixels;
+            scrollAccumulator -= movePixels;
+        }
+        scrollRequest = requestAnimationFrame(smoothScrollLoop);
+    }
+
+    function togglePlayPause() {
+        isPlaying = !isPlaying;
+        document.getElementById('play-pause-btn').innerText = isPlaying ? "⏸" : "▶";
+        if(isPlaying) {
+            scrollAccumulator = 0;
+            smoothScrollLoop();
+        } else {
+            cancelAnimationFrame(scrollRequest);
+        }
+    }
+
+    function changeSpeed(v) {
+        autoScrollSpeed = Math.max(0.2, parseFloat((autoScrollSpeed + v).toFixed(2)));
+        document.getElementById('speed-val').innerText = autoScrollSpeed;
+    }
+
+    function toggleDarkMode() {
+        viewer.style.filter = viewer.style.filter.includes('invert') ? 'none' : 'invert(0.9) hue-rotate(180deg)';
+    }
+
+    function adjustDimmer() {
+        dimLevel = (dimLevel + 0.2) % 1;
+        document.getElementById('dimmer').style.opacity = dimLevel;
+    }
+
+    function setAlert() {
+        const min = prompt("Reminder (Minutes):", "30");
+        if (min) setTimeout(() => alert("⏰ SubhanAllah! Break Time."), min * 60000);
+    }
+
+    let startTime = Date.now();
+    setInterval(() => {
+        const d = new Date(Date.now() - startTime);
+        document.getElementById('stopwatch').innerText = d.toISOString().substr(11, 8);
+    }, 1000);
+
+    window.onload = initPDF;
+</script>
+<div id="dimmer" style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; pointer-events:none; opacity:0; z-index:9999;"></div>
+</body>
+</html>
