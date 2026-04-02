@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hash Clock Pro - Optimized Display</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: radial-gradient(circle at center, #1a1a2e 0%, #050507 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .app-container { width: 100%; max-width: 500px; text-align: center; }
+        
+        canvas {
+            width: 85vw; height: 85vw; max-width: 380px; max-height: 380px;
+            filter: drop-shadow(0 0 30px rgba(46, 213, 115, 0.1));
+        }
+
+        .digital-section {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-badge {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: #ff4757;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .digital-watch {
+            background: #000;
+            padding: 10px 35px;
+            border-radius: 15px;
+            border: 1px solid #222;
+        }
+
+        .digital-time {
+            font-family: 'Courier New', monospace;
+            font-size: 3rem;
+            color: #2ed573;
+            text-shadow: 0 0 20px rgba(46, 213, 115, 0.5);
+            letter-spacing: 5px;
+        }
+
+        .dots { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <canvas id="hashClock" width="1200" height="1200"></canvas>
+        
+        <div class="digital-section">
+            <div class="date-badge" id="current-date">-- -- ----</div>
+            <div class="digital-watch">
+                <div class="digital-time">
+                    <span id="d-hour">0</span><span class="dots">:</span><span id="d-min">00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('hashClock');
+        const ctx = canvas.getContext('2d');
+        const radius = canvas.width / 2;
+
+        function updateClock() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = radius, cy = radius, clockR = radius - 150;
+            const startAngle = -70 * (Math.PI / 180);
+            const sweepAngle = 320 * (Math.PI / 180);
+
+            // Midnight Start Logic
+            const now = new Date();
+            const totalMsToday = (now.getHours() * 3600000) + (now.getMinutes() * 60000) + (now.getSeconds() * 1000) + now.getMilliseconds();
+            const currentUnitsPrecise = (totalMsToday / 86400000) * 144;
+            const h = Math.floor(currentUnitsPrecise / 16);
+            const m = Math.floor(currentUnitsPrecise % 16);
+
+            // Digital UI Update
+            document.getElementById('d-hour').innerText = h;
+            document.getElementById('d-min').innerText = m.toString().padStart(2, '0');
+            document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            // 1. DUAL LINE BRANDING (Hash Clock)
+            ctx.fillStyle = "#ff4757";
+            ctx.textAlign = "center";
+            ctx.letterSpacing = "6px";
+            
+            // "Hash" upar wali line
+            ctx.font = "bold 50px Arial";
+            ctx.fillText("HASH", cx, cy - (clockR + 60));
+            
+            // "Clock" neeche wali line
+            ctx.font = "400 40px Arial";
+            ctx.fillText("CLOCK", cx, cy - (clockR + 15));
+
+            // 2. Markers
+            for (let i = 0; i <= 16; i++) {
+                let angle = startAngle + (i * (sweepAngle / 16));
+                ctx.lineWidth = 4; ctx.strokeStyle = "rgba(46, 213, 115, 0.3)";
+                ctx.beginPath();
+                ctx.moveTo(cx + clockR * Math.cos(angle), cy + clockR * Math.sin(angle));
+                ctx.lineTo(cx + (clockR - 20) * Math.cos(angle), cy + (clockR - 20) * Math.sin(angle));
+                ctx.stroke();
+                ctx.fillStyle = "#2ed573"; ctx.font = "38px monospace";
+                ctx.fillText(i, cx + (clockR + 70) * Math.cos(angle), cy + (clockR + 70) * Math.sin(angle));
+            }
+
+            for (let i = 0; i <= 9; i++) {
+                let angle = startAngle + (i * (sweepAngle / 9));
+                ctx.lineWidth = 15; ctx.strokeStyle = "#ffffff";
+                ctx.beginPath();
+                ctx.moveTo(cx + clockR * Math.cos(angle), cy + clockR * Math.sin(angle));
+                ctx.lineTo(cx + (clockR - 70) * Math.cos(angle), cy + (clockR - 70) * Math.sin(angle));
+                ctx.stroke();
+                ctx.fillStyle = "#ffffff"; ctx.font = "bold 85px Arial";
+                ctx.fillText(i, cx + (clockR - 160) * Math.cos(angle), cy + (clockR - 160) * Math.sin(angle));
+            }
+
+            // 3. Needles (Hands)
+            const hAngle = startAngle + (currentUnitsPrecise * (sweepAngle / 144));
+            const mAngle = startAngle + ((currentUnitsPrecise % 16) * (sweepAngle / 16));
+            drawNeedle(hAngle, clockR * 0.5, 24, '#ffffff');
+            drawNeedle(mAngle, clockR * 0.85, 10, '#2ed573');
+
+            // Center
+            ctx.beginPath(); ctx.arc(cx, cy, 35, 0, Math.PI*2); ctx.fillStyle = "#0a0a0a"; ctx.fill();
+            ctx.beginPath(); ctx.arc(cx, cy, 15, 0, Math.PI*2); ctx.fillStyle = "#ff4757"; ctx.fill();
+
+            requestAnimationFrame(updateClock);
+        }
+
+        function drawNeedle(angle, len, width, color) {
+            ctx.save();
+            ctx.shadowBlur = 25; ctx.shadowColor = color;
+            ctx.beginPath(); ctx.lineWidth = width; ctx.lineCap = 'round'; ctx.strokeStyle = color;
+            ctx.moveTo(radius, radius);
+            ctx.lineTo(radius + len * Math.cos(angle), radius + len * Math.sin(angle));
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        updateClock();
+    </script>
+</body>
+</html>
