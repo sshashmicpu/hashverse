@@ -1,0 +1,39 @@
+ Sada-e-Quran
+
+​A Beautiful Blend of Holy Recitation and Urdu Translation
+
+​Sada-e-Quran is a modern and user-friendly web application designed for those who want to listen to and understand the Holy Quran with its meaning. Developed by Syed Sakhir Hashmi, this app combines technical excellence with religious devotion.
+
+​✨ Key Features
+
+​🤝 Multi-School of Thought (Inclusive):
+The app includes authentic translations from various Islamic schools of thought (such as M.H. Najafi, Jalandhry, and Dr. Qadri), allowing every user to choose the translation they trust most.
+
+​📜 Smart Auto-Scroll:
+
+As you listen, the app automatically scrolls to the specific verse (Ayah) being recited. This keeps your focus on the text without needing to touch the screen manually.
+
+​🎧 Dual Audio Support:
+
+A unique feature that plays the Arabic recitation followed immediately by the Urdu translation (in the voice of Shamshad Ali Khan).
+
+​📱 Fully Optimized Design:
+
+Whether you are using a mobile, tablet, or desktop, the app works perfectly. It is fully optimized for both Portrait and Landscape modes.
+
+​🔳 Double Layout Option:
+
+The app offers a flexible layout choice, making it easy to view the Surah list and the recitation area side-by-side on larger screens like tablets.
+
+​🌙 AMOLED Black UI:
+
+Designed with a high-contrast black theme to protect your eyes during night reading and save battery life on mobile devices.
+
+​✍️ Active Verse Highlighting:
+
+The verse currently being played is highlighted brightly, while others are dimmed, ensuring your full attention stays on the active Ayah.
+
+​👨‍💻 Created By
+​Syed Sakhir Hashmi
+
+A software developer dedicated to using technology for the service of humanity and faith.
