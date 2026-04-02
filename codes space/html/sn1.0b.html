@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Namaz-e-Jafria - HashTech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Amiri:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #00d2ff;
+            --primary-purple: #9d50bb;
+            --bg-dark: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-light: #f0f0f0;
+            --gold-alt: #FFD700;
+            --islamic-green: #004d40;
+            --royal-header: linear-gradient(145deg, #002d26, #004d40, #001a14);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; height: 100vh;
+            user-select: none;
+        }
+
+        /* --- TOP HEADER BAR (NEW DESIGN & TEXTURE) --- */
+        .header-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 75px;
+            background: var(--royal-header);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,215,0,0.1);
+            border-bottom: 2px solid var(--gold-alt);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; box-sizing: border-box; z-index: 5500;
+            transition: 0.5s ease;
+            background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png"); /* Subtle Texture */
+        }
+        .header-center { text-align: center; flex-grow: 1; }
+        .header-title { font-family: 'Noto Nastaliq Urdu', serif; font-size: 20px; color: var(--gold-alt); margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .header-credit { font-family: 'Noto Nastaliq Urdu', serif; font-size: 10px; color: #ddd; }
+        
+        .header-pill {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--gold-alt);
+            padding: 5px 12px; border-radius: 50px; font-size: 12px;
+            display: flex; align-items: center; gap: 8px; min-width: 60px; justify-content: center;
+            color: var(--gold-alt);
+        }
+
+        /* --- SPLASH SCREEN (DESCRIPTION ADDED) --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #002d26 0%, #000 100%);
+            z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .spiritual-glow { position: absolute; width: 300px; height: 300px; background: var(--islamic-green); filter: blur(100px); opacity: 0.3; animation: pulseGlow 4s infinite alternate; }
+        @keyframes pulseGlow { from { transform: scale(1); opacity: 0.2; } to { transform: scale(1.3); opacity: 0.5; } }
+        .bismillah { font-family: 'Noto Nastaliq Urdu', serif; font-size: 26px; color: var(--gold-alt); z-index: 1; margin-bottom: 20px; }
+        .app-title { font-family: 'Noto Nastaliq Urdu', serif; font-size: 48px; color: #fff; z-index: 1; margin: 0; }
+        .sub-heading { font-family: 'Amiri', serif; font-size: 16px; color: var(--gold-alt); z-index: 1; font-style: italic; margin-bottom: 10px; }
+        .app-desc { font-family: 'Noto Nastaliq Urdu', serif; font-size: 14px; color: #ccc; z-index: 1; text-align: center; max-width: 80%; line-height: 1.8; margin-bottom: 20px; }
+        .splash-footer { position: absolute; bottom: 30px; text-align: center; z-index: 1; }
+        .dev-credit { font-family: 'Orbitron', sans-serif; font-size: 9px; color: var(--primary-blue); letter-spacing: 2px; }
+        .presenter-credit { font-family: 'Noto Nastaliq Urdu', serif; font-size: 13px; color: #fff; margin-bottom: 5px; }
+        .loading-bar-container { width: 180px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; z-index: 1; }
+        .loading-bar-fill { width: 0%; height: 100%; background: var(--gold-alt); animation: loadProgress 3s linear forwards; }
+        @keyframes loadProgress { from { width: 0%; } to { width: 100%; } }
+
+        /* --- SIDE DOCK --- */
+        .side-dock {
+            position: fixed; left: 15px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 12px; z-index: 5000;
+            transition: 0.5s ease;
+        }
+        .dock-btn { width: 42px; height: 42px; border-radius: 12px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; transition: 0.3s; }
+        .dock-btn span { font-size: 7px; margin-top: 2px; }
+
+        /* --- BOTTOM CONTROLS --- */
+        .bottom-floating-dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 450px; height: 75px; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(20px); border-radius: 25px; border: 1px solid rgba(0, 210, 255, 0.3); display: flex; align-items: center; justify-content: space-around; z-index: 5000; transition: 0.5s; }
+        .play-main { width: 55px; height: 55px; background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple)); border-radius: 50%; border: none; color: white; font-size: 24px; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
+        .go-input-modern { background: rgba(255,255,255,0.05); border: 1px solid var(--primary-purple); border-radius: 12px; display: flex; height: 38px; }
+        .go-input-modern input { width: 40px; border: none; background: none; color: white; text-align: center; outline: none; }
+        .go-input-modern button { background: var(--primary-purple); border: none; color: white; padding: 0 10px; font-weight: bold; }
+
+        /* --- VIEWER --- */
+        #viewer-container { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; overflow-y: auto; scrollbar-width: none; background: #080808; z-index: 1; }
+        #viewer-container::-webkit-scrollbar { display: none; }
+        #pdf-render-container { display: flex; flex-direction: column; align-items: center; padding: 120px 0 150px 0; }
+        .page-slot { width: 95%; max-width: 800px; min-height: 500px; margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #111; display: flex; align-items: center; justify-content: center; }
+        canvas { width: 100% !important; height: auto !important; }
+
+        /* --- SCROLLER --- */
+        #fast-scroller-container { position: fixed; right: 8px; top: 100px; bottom: 120px; width: 35px; z-index: 4000; }
+        #scroller-track { position: absolute; left: 15px; top: 0; bottom: 0; width: 3px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        #scroller-thumb { position: absolute; width: 35px; height: 45px; background: var(--primary-blue); left: 0; border-radius: 8px; box-shadow: 0 0 15px var(--primary-blue); display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 11px; touch-action: none; z-index: 5; }
+        #scroller-number-popup { position: absolute; right: 50px; background: var(--primary-blue); color: black; padding: 5px 12px; border-radius: 8px; font-weight: bold; font-size: 16px; display: none; pointer-events: none; }
+
+        #unhide-btn { position: fixed; bottom: 30px; right: 20px; z-index: 6000; background: var(--primary-blue); color: black; border: none; width: 50px; height: 50px; border-radius: 50%; font-weight: bold; display: none; }
+        #dimmer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; pointer-events: none; opacity: 0; z-index: 9999; }
+        .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
+    </style>
+</head>
+<body onclick="handleTap(event)">
+
+<div class="header-bar" id="top-title-bar">
+    <div class="header-pill"><span style="color:var(--gold-alt)">⏱</span><span id="stopwatch">00:00</span></div>
+    <div class="header-center">
+        <h1 class="header-title">نمازِ جعفریہ</h1>
+        <div class="header-credit">پیشکش: سید ساخر ہاشمی</div>
+    </div>
+    <div class="header-pill"><span id="page-label">1</span><span style="font-size: 8px; opacity: 0.7; margin-left: 3px;">PG</span></div>
+</div>
+
+<div id="splash-screen">
+    <div class="spiritual-glow"></div>
+    <div class="bismillah">بِسْمِ اللہِ الرَّحْمٰنِ الرَّحِیْمِ</div>
+    <div class="app-title">نمازِ جعفریہ</div>
+    <div class="sub-heading">Shia Prayer Book Urdu</div>
+    <div class="app-desc">تمام مومنین کے لیے مکمل نمازِ جعفریہ، دعائیں اور اعمال کا بہترین مجموعہ ایک ہی جگہ پر۔</div>
+    <div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
+    <div class="splash-footer">
+        <div class="presenter-credit">پیشکش: سید ساخر ہاشمی</div>
+        <div class="dev-credit">App developed by HashTech</div>
+    </div>
+</div>
+
+<div class="side-dock ui-hidden" id="side-dock">
+    <button class="dock-btn" onclick="toggleDarkMode()">🌓<span>DARK</span></button>
+    <button class="dock-btn" onclick="adjustDimmer()">🌙<span>DIM</span></button>
+    <button class="dock-btn" onclick="setAlert()">⏰<span>ALERT</span></button>
+    <button class="dock-btn" id="save-btn" onclick="saveForOffline()">💾<span>SAVE</span></button>
+    <button class="dock-btn" onclick="toggleControlPanel()" style="color:#ff4757;">✖<span>HIDE</span></button>
+</div>
+
+<div id="fast-scroller-container">
+    <div id="scroller-track"></div>
+    <div id="scroller-number-popup">1</div>
+    <div id="scroller-thumb">|||</div>
+</div>
+
+<button id="unhide-btn" onclick="toggleControlPanel()">UI</button>
+
+<div class="bottom-floating-dock ui-hidden" id="main-panel">
+    <button onclick="goToPage(currentPage - 1)" style="background:none; border:none; color:white; font-size: 11px;">◀ PREV</button>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <button onclick="changeSpeed(-0.05)" class="dock-btn" style="height:35px; width:35px;">➖</button>
+        <button id="play-pause-btn" class="play-main" onclick="togglePlayPause()">▶</button>
+        <button onclick="changeSpeed(0.05)" class="dock-btn" style="height:35px; width:35px;">➕</button>
+    </div>
+    <div class="go-input-modern">
+        <input type="number" id="go-to-input" placeholder="0">
+        <button onclick="goToPage(document.getElementById('go-to-input').value)">GO</button>
+    </div>
+    <button onclick="goToPage(currentPage + 1)" style="background:none; border:none; color:white; font-size: 11px;">NEXT ▶</button>
+</div>
+
+<div id="viewer-container" onscroll="trackProgress()">
+    <div id="pdf-render-container"></div>
+</div>
+
+<div id="dimmer"></div>
+
+<script>
+    const CACHE_NAME = 'shia-namaz-cache-v1';
+    const pdfUrl = 'https://raw.githubusercontent.com/sshashmicpu/books/main/shia%20namaz%20jafria%20in%20urdu%20by%20iqtada.pdf';
+    
+    let pdfDoc = null, currentPage = 1, autoScrollSpeed = 0.2, isPlaying = false, dimLevel = 0;
+    let scrollRequest = null, uiTimer = null, scrollAccumulator = 0;
+
+    const thumb = document.getElementById('scroller-thumb');
+    const track = document.getElementById('fast-scroller-container');
+    const viewer = document.getElementById('viewer-container');
+    const popup = document.getElementById('scroller-number-popup');
+    const sideDock = document.getElementById('side-dock');
+    const topBar = document.getElementById('top-title-bar');
+    const mainPanel = document.getElementById('main-panel');
+
+    // Splash Control
+    setTimeout(() => {
+        document.getElementById('splash-screen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+            showControls(); // Auto show UI after splash
+        }, 800);
+    }, 3500);
+
+    // FIXED: Tap on control panel/bars won't hide side buttons
+    function handleTap(e) {
+        if (e.target.closest('.header-bar') || e.target.closest('.bottom-floating-dock') || e.target.closest('.side-dock') || e.target.closest('#fast-scroller-container')) {
+            return; 
+        }
+        showControls();
+    }
+
+    function showControls() {
+        if(document.getElementById('unhide-btn').style.display === 'block') return;
+        
+        sideDock.classList.remove('ui-hidden');
+        topBar.classList.remove('ui-hidden');
+        mainPanel.classList.remove('ui-hidden');
+        
+        clearTimeout(uiTimer);
+        uiTimer = setTimeout(() => {
+            if (!isDragging && (isPlaying || !isDragging)) {
+                sideDock.classList.add('ui-hidden');
+                topBar.classList.add('ui-hidden');
+                mainPanel.classList.add('ui-hidden');
+            }
+        }, 4000);
+    }
+
+    let isDragging = false;
+    thumb.addEventListener('pointerdown', (e) => { 
+        isDragging = true; 
+        thumb.setPointerCapture(e.pointerId); 
+        popup.style.display = 'block';
+    });
+    window.addEventListener('pointermove', (e) => {
+        if (!isDragging || !pdfDoc) return;
+        const rect = track.getBoundingClientRect();
+        let pos = (e.clientY - rect.top) / rect.height;
+        pos = Math.max(0, Math.min(1, pos));
+        const targetPage = Math.ceil(pos * (pdfDoc.numPages - 1)) + 1;
+        popup.innerText = targetPage;
+        popup.style.top = (pos * 100) + '%';
+        goToPage(targetPage);
+    });
+    window.addEventListener('pointerup', () => { 
+        isDragging = false; 
+        popup.style.display = 'none';
+        showControls();
+    });
+
+    // LAZY LOADING (Optimized for Speed)
+    const pageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const pageNum = parseInt(entry.target.dataset.page);
+                renderPage(pageNum, entry.target);
+                // Pre-render next page for speed
+                if(pageNum < pdfDoc.numPages) {
+                    const nextSlot = document.getElementById('slot-' + (pageNum + 1));
+                    if(nextSlot) renderPage(pageNum + 1, nextSlot);
+                }
+            }
+        });
+    }, { root: viewer, rootMargin: '1000px 0px', threshold: 0.01 });
+
+    async function checkOfflineStatus() {
+        const cache = await caches.open(CACHE_NAME);
+        if(await cache.match(pdfUrl)) document.getElementById('save-btn').innerHTML = "✅<span>SAVED</span>";
+    }
+
+    async function saveForOffline() {
+        const btn = document.getElementById('save-btn');
+        btn.innerHTML = "⏳<span>...</span>";
+        try {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.add(pdfUrl);
+            btn.innerHTML = "✅<span>SAVED</span>";
+        } catch (e) { btn.innerHTML = "❌<span>FAIL</span>"; }
+    }
+
+    async function initPDF() {
+        await checkOfflineStatus();
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        try {
+            const cache = await caches.open(CACHE_NAME);
+            const response = await cache.match(pdfUrl);
+            const data = response ? await response.arrayBuffer() : pdfUrl;
+            pdfDoc = await pdfjsLib.getDocument(data).promise;
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'page-slot'; slot.id = 'slot-' + i; slot.dataset.page = i;
+                document.getElementById('pdf-render-container').appendChild(slot);
+                pageObserver.observe(slot);
+            }
+            if(localStorage.getItem('lastPageJafria')) goToPage(localStorage.getItem('lastPageJafria'));
+        } catch (err) { console.error("PDF Load Error"); }
+    }
+
+    async function renderPage(num, target) {
+        if (target.dataset.rendered === 'true' || target.dataset.rendering === 'true') return;
+        target.dataset.rendering = 'true';
+        try {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            canvas.height = viewport.height; canvas.width = viewport.width;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+            target.innerHTML = ''; // Clear loader
+            target.appendChild(canvas);
+            target.dataset.rendered = 'true';
+        } catch(e) { console.log("Render error"); }
+        target.dataset.rendering = 'false';
+    }
+
+    function goToPage(num) {
+        const n = parseInt(num);
+        if(!n || n < 1 || (pdfDoc && n > pdfDoc.numPages)) return;
+        const el = document.getElementById('slot-' + n);
+        if(el) { viewer.scrollTop = el.offsetTop - 80; currentPage = n; updateUI(); }
+    }
+
+    function updateUI() {
+        document.getElementById('page-label').innerText = currentPage;
+        localStorage.setItem('lastPageJafria', currentPage);
+        if (pdfDoc && !isDragging) thumb.style.top = ((currentPage-1) / (pdfDoc.numPages-1) * 94) + '%';
+    }
+
+    function trackProgress() {
+        const slots = document.querySelectorAll('.page-slot');
+        slots.forEach(div => {
+            const rect = div.getBoundingClientRect();
+            if(rect.top >= 0 && rect.top < 400) { currentPage = parseInt(div.dataset.page); updateUI(); }
+        });
+    }
+
+    function toggleControlPanel() {
+        const isHidden = mainPanel.classList.toggle('ui-hidden');
+        topBar.classList.toggle('ui-hidden');
+        sideDock.classList.toggle('ui-hidden');
+        document.getElementById('unhide-btn').style.display = isHidden ? 'block' : 'none';
+    }
+
+    function smoothScrollLoop() {
+        if (!isPlaying) return;
+        scrollAccumulator += autoScrollSpeed;
+        if (scrollAccumulator >= 1) { const pix = Math.floor(scrollAccumulator); viewer.scrollTop += pix; scrollAccumulator -= pix; }
+        scrollRequest = requestAnimationFrame(smoothScrollLoop);
+    }
+
+    function togglePlayPause() {
+        isPlaying = !isPlaying;
+        document.getElementById('play-pause-btn').innerText = isPlaying ? "⏸" : "▶";
+        if(isPlaying) { smoothScrollLoop(); } else cancelAnimationFrame(scrollRequest);
+    }
+
+    function changeSpeed(v) { autoScrollSpeed = Math.max(0.1, autoScrollSpeed + v); }
+    function toggleDarkMode() { viewer.style.filter = viewer.style.filter.includes('invert') ? 'none' : 'invert(0.9) hue-rotate(180deg)'; }
+    function adjustDimmer() { dimLevel = (dimLevel + 0.2) % 0.8; document.getElementById('dimmer').style.opacity = dimLevel; }
+    function setAlert() { const m = prompt("Minutes:"); if(m) setTimeout(()=>alert("Time for Ibadat!"), m*60000); }
+
+    let startTime = Date.now();
+    setInterval(() => {
+        const d = new Date(Date.now() - startTime);
+        const m = String(d.getUTCMinutes()).padStart(2, '0');
+        const s = String(d.getUTCSeconds()).padStart(2, '0');
+        document.getElementById('stopwatch').innerText = `${m}:${s}`;
+    }, 1000);
+
+    window.onload = initPDF;
+</script>
+</body>
+</html>
