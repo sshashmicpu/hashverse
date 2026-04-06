@@ -1,0 +1,50 @@
+Urdu Kaatib: The Professional Urdu & Arabic Desktop Publisher ✍️✨
+
+​Experience the power of a desktop publishing suite on your mobile! Urdu Kaatib is the first-of-its-kind tool designed for professional Urdu and Arabic typesetting. Whether you are creating Islamic posters, writing articles, or managing complex Urdu data, this app is your ultimate companion.
+
+​🔥 Exclusive Advanced Features:
+
+​🖋️ Multi-Font Typography: Choose from professional fonts like Jameel Noori Nastaliq, Amiri (Arabic), Lateef, and more. Perfect for achieving that authentic "InPage" look.
+
+​🤖 Smart Auto-Arabic Detection: Write Urdu and Arabic together! The app automatically identifies Arabic text and applies specialized fonts to keep the script accurate and beautiful.
+
+​📂 Dynamic Data Management: * Save/Load Project: Never lose your work. Save your current session and resume whenever you want. 
+
+​Import/Export Files: Move your projects as data files between devices or share them with other developers.
+
+​📄 Professional Output: * Export to PDF: Convert your entire work into a high-quality PDF document instantly. 
+
+​Image Conversion: Turn your text layouts into clear visuals for social media.
+
+​🎨 Full Creative Control (Side Toolbar):
+
+​🌈 Color Customization: * Text Color: Change the color of your words with a professional color picker. 
+
+​Background Color: Set the perfect canvas color for your document.
+
+​Arabic Color: Give Arabic text a different color automatically for better highlighting.
+
+​📏 Precise Formatting: 
+
+​Font Size Slider: Adjust text size from 1 to 100 with precision.
+
+​Bold & Underline: One-tap formatting to emphasize important points.
+
+​🖱️ Navigation & UX: 
+
+​Auto-Scroll: Smooth scrolling controls (Play/Pause/Speed) to read or review your work without manual effort.
+
+​Clear All: Reset your canvas in one click.
+
+​Modern UI: A clean, collapsible side menu that keeps your workspace distraction-free.
+
+​Who is this for?
+
+​Urdu Content Creators: For making high-quality social media posts and banners.
+
+​App & Web Developers: To design Urdu layouts and export clean data files.
+
+​Writers & Editors: For drafting long-form Urdu articles with correct Arabic citations.
+
+​Developed with precision by SS HASHMI—Bringing professional Urdu Kaatibi (Calligraphy) to the digital age! 
+
