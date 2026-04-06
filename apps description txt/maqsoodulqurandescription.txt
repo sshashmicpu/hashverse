@@ -1,0 +1,42 @@
+Maqsood-ul-Quran App ✨
+
+​"Understand the Holy Quran with Ease."
+
+​Maqsood-ul-Quran is a smart digital Quran reader designed to make reading and understanding the Holy Quran simple for everyone. It features the beautiful Al-Kitab-ur-Rahman translation, which is written in very easy language.
+
+​📖 About the Translation:
+
+​Easy to Read: The translation is written in simple words so children and adults can understand it easily.
+
+​Pure Message: It focuses on the true message of the Quran, free from any specific group or sect.
+
+​Beautiful Look: The text and graphics are designed to be clean and clear for a better reading experience.
+
+​🌟 Smart App Features:
+
+​This app is built with advanced tools to help you stay focused on your recitation:
+
+​Smart Memory: The app automatically remembers the last page you were reading. When you open it again, it starts exactly where you left off.
+
+​Auto-Scroll: You can set the page to move down automatically (like a teleprompter) so you can read without touching the screen.
+
+​Time Tracker: See exactly how many minutes or hours you spent reading the Quran today.
+
+​Dark & Dim Modes: Switch to Dark Mode or Dim Light to protect your eyes when reading at night.
+
+​Quick Navigation: Use the "Go To" button or the slider to jump to any page or Surah instantly.
+
+​Works Offline: You don't need the internet to read. Open the app and start your journey anywhere.
+
+​🛠 Why this App is Better:
+
+​Clean Design: No distracting ads or complicated menus.
+
+​Full Screen Mode: Hide all buttons with one tap to focus only on the Quranic text.
+
+​High Quality: Every word is sharp and easy to read, even on small screens.
+
+​Maqsood-ul-Quran – Bringing the message of the Quran to every heart.
+
+​Developed by: Syed Sakhir Hashmi // HashTech
+
