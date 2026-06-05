@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hashmi Digital Universe v5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
+        
+        :root { 
+            --neon-blue: #38bdf8; 
+            --neon-green: #22c55e; 
+            --neon-red: #ef4444; 
+            --bg-deep: #0f111a; 
+            --card-bg: #1a1d29; 
+        }
+
+        body { 
+            background-color: var(--bg-deep); 
+            color: #f1f5f9; 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        header { background: #111420; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .scifi-header { font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
+
+        .promo-banner {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+            min-height: 180px;
+        }
+
+        .glass-panel { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .glass-panel:hover { 
+            transform: scale(1.03); 
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .app-icon { width: 80px; height: 80px; border-radius: 18px; object-fit: cover; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+
+        .pdf-preview-container { 
+            width: 100%; height: 220px; background: #000; border-radius: 16px; 
+            display: flex; align-items: center; justify-content: center; padding: 10px; 
+        }
+
+        .pdf-preview-container img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+
+        .tab-btn { 
+            padding: 12px 20px; border-radius: 50px; font-weight: 700; transition: 0.3s; 
+            background: #24283b; color: #94a3b8; font-size: 14px;
+        }
+
+        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+
+        .action-btn {
+            background: #00c853; color: white; border-radius: 50px; padding: 8px 16px;
+            font-weight: bold; font-size: 12px; text-transform: uppercase; transition: 0.2s;
+        }
+
+        .action-btn:hover { background: #00e676; transform: translateY(-2px); }
+
+        .ss-slider { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
+        .ss-slider::-webkit-scrollbar { display: none; }
+        .ss-img { flex: 0 0 140px; height: 250px; border-radius: 14px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+
+        #modal-overlay { backdrop-filter: blur(10px); background: rgba(0, 0, 0, 0.92); }
+
+        .search-container { background: #1e2235; border-radius: 50px; padding: 4px 16px; }
+
+        /* Row Scrolling for Home */
+        .row-container { display: flex; overflow-x: auto; gap: 20px; padding: 10px 5px; scrollbar-width: none; }
+        .row-container::-webkit-scrollbar { display: none; }
+        .row-item { flex: 0 0 160px; }
+        .row-item-wide { flex: 0 0 280px; }
+    </style>
+</head>
+<body>
+
+    <header class="sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://raw.githubusercontent.com/sshashmicpu/Test/main/icons/hashverseicon.png" class="w-10 h-10 rounded-xl shadow-lg" alt="Logo">
+                <h1 class="scifi-header text-xl font-bold bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">HASH VERSE</h1>
+            </div>
+            <div class="search-container flex items-center w-40 md:w-80">
+                <i class="fas fa-search text-slate-500 mr-2"></i>
+                <input type="text" id="globalSearch" placeholder="Search..." class="bg-transparent border-none text-sm focus:outline-none w-full py-1">
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-24">
+        
+        <section class="mt-6 mb-8 px-2">
+            <div id="dynamic-banner" class="promo-banner p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="text-center md:text-left">
+                    <h2 id="banner-title" class="text-3xl font-bold text-white mb-2">Explore Universe</h2>
+                    <p id="banner-desc" class="text-slate-400">Loading featured content...</p>
+                </div>
+                <img id="banner-img" src="https://raw.githubusercontent.com/sshashmicpu/Test/main/icons/hashverseicon.png" class="w-24 h-24 md:w-32 md:h-32 rounded-3xl shadow-2xl">
+            </div>
+        </section>
+
+        <nav class="flex overflow-x-auto gap-3 py-4 no-scrollbar mb-6 px-2">
+            <button onclick="switchTab('home')" class="tab-btn active shrink-0" id="tab-home">Home</button>
+            <button onclick="switchTab('nebula')" class="tab-btn shrink-0" id="tab-nebula">Apps Nebula</button>
+            <button onclick="switchTab('galaxy')" class="tab-btn shrink-0" id="tab-galaxy">PDF Galaxy</button>
+            <button onclick="switchTab('space')" class="tab-btn shrink-0" id="tab-space">Codes Space</button>
+            <button onclick="switchTab('station')" class="tab-btn shrink-0" id="tab-station">Sites Station</button>
+        </nav>
+
+        <div id="loading" class="flex flex-col items-center justify-center py-20">
+            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <section id="sec-home" class="tab-content">
+            <div class="mb-10">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="text-xl font-bold text-white">Trending Apps</h2>
+                    <span class="text-blue-400 text-sm cursor-pointer" onclick="switchTab('nebula')">See All</span>
+                </div>
+                <div id="row-nebula" class="row-container"></div>
+            </div>
+
+            <div class="mb-10">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="text-xl font-bold text-orange-400">Latest PDFs</h2>
+                    <span class="text-blue-400 text-sm cursor-pointer" onclick="switchTab('galaxy')">See All</span>
+                </div>
+                <div id="row-galaxy" class="row-container"></div>
+            </div>
+
+            <div class="mb-10">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="text-xl font-bold text-purple-400">Recent Codes</h2>
+                    <span class="text-blue-400 text-sm cursor-pointer" onclick="switchTab('space')">See All</span>
+                </div>
+                <div id="row-space" class="row-container"></div>
+            </div>
+
+            <div class="mb-10">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="text-xl font-bold text-green-400">Top Portals</h2>
+                    <span class="text-blue-400 text-sm cursor-pointer" onclick="switchTab('station')">See All</span>
+                </div>
+                <div id="row-station" class="row-container"></div>
+            </div>
+        </section>
+
+        <section id="sec-nebula" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-6 px-2">
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-fire text-orange-500 mr-2"></i> Hot Apps</h2>
+            </div>
+            <div id="grid-nebula" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+        </section>
+
+        <section id="sec-galaxy" class="tab-content hidden">
+            <div id="hashmi-research" class="mb-12">
+                <h2 class="text-xl font-bold text-red-500 mb-6 px-2 uppercase tracking-widest">Research Hub</h2>
+                <div id="grid-research" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+            </div>
+            <div id="all-pdfs">
+                <h2 class="text-xl font-bold text-orange-400 mb-6 px-2 uppercase tracking-widest">Archives</h2>
+                <div id="grid-pdf-general" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+            </div>
+        </section>
+
+        <section id="sec-space" class="tab-content hidden">
+            <div id="grid-space" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <section id="sec-station" class="tab-content hidden">
+            <div id="grid-station" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+    </main>
+
+    <div id="modal-overlay" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4" onclick="if(event.target == this) closeModal()">
+        <div class="glass-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-10 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <footer class="py-10 text-center border-t border-slate-800">
+        <p class="text-slate-500 text-sm">© 2026 Syed Sakhir Hashmi</p>
+    </footer>
+
+    <script>
+        const CONFIG = { 
+            owner: 'sshashmicpu', 
+            repo: 'Test', 
+            branch: 'main', 
+            folders: { 
+                apps: "apps nebula/androis apk's", 
+                icons: "icons", 
+                desc: "apps description txt", 
+                pdf: "pdf galaxy", 
+                html: "codes space/html", 
+                sites: "sites station/url's", 
+                ss: "screenshots" 
+            } 
+        };
+        
+        let REPO_DATA = [];
+        let APP_MAP = {};
+        let PDF_LIST = [];
+
+        async function init() {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/git/trees/${CONFIG.branch}?recursive=1`);
+                const data = await res.json();
+                REPO_DATA = data.tree;
+                processMapping();
+                renderApps();
+                renderPDFs();
+                renderCodes();
+                renderSites();
+                updateBanner();
+                document.getElementById('loading').classList.add('hidden');
+            } catch (err) { console.error("System Failure", err); }
+        }
+
+        function processMapping() {
+            REPO_DATA.forEach(item => {
+                const fileName = item.path.split('/').pop().toLowerCase();
+                const baseName = fileName.split('.')[0];
+
+                if (item.path.includes(CONFIG.folders.apps) && fileName.endsWith('.apk')) {
+                    const realBase = item.path.split('/').pop().split('.')[0];
+                    if(!APP_MAP[realBase.toLowerCase()]) APP_MAP[realBase.toLowerCase()] = { realName: realBase };
+                    APP_MAP[realBase.toLowerCase()].apk = item.path;
+                }
+                if (item.path.startsWith(CONFIG.folders.icons) && fileName.includes('icon')) {
+                    const iconBase = fileName.replace('icon', '').split('.')[0];
+                    if(!APP_MAP[iconBase]) APP_MAP[iconBase] = { realName: iconBase };
+                    APP_MAP[iconBase].icon = item.path;
+                }
+                if (item.path.startsWith(CONFIG.folders.desc) && fileName.includes('description')) {
+                    const descBase = fileName.replace('description', '').split('.')[0];
+                    if(!APP_MAP[descBase]) APP_MAP[descBase] = { realName: descBase };
+                    APP_MAP[descBase].descPath = item.path;
+                }
+                if (item.path.startsWith(CONFIG.folders.html) && fileName.endsWith('.html')) {
+                    if(!APP_MAP[baseName]) APP_MAP[baseName] = { realName: baseName };
+                    APP_MAP[baseName].codePath = item.path;
+                }
+            });
+        }
+
+        function updateBanner() {
+            const keys = Object.keys(APP_MAP).filter(k => APP_MAP[k].apk);
+            const randomKey = keys[Math.floor(Math.random() * keys.length)];
+            if(randomKey) {
+                const app = APP_MAP[randomKey];
+                document.getElementById('banner-title').innerText = app.realName;
+                document.getElementById('banner-desc').innerText = "Featured App in Apps Nebula";
+                if(app.icon) document.getElementById('banner-img').src = getRawUrl(app.icon);
+            }
+        }
+
+        function renderApps() {
+            const grid = document.getElementById('grid-nebula');
+            const row = document.getElementById('row-nebula');
+            Object.keys(APP_MAP).forEach(key => {
+                const app = APP_MAP[key];
+                if(!app.apk) return;
+                const iconUrl = app.icon ? getRawUrl(app.icon) : 'https://cdn-icons-png.flaticon.com/512/2584/2584651.png';
+                const html = `
+                <div class="glass-panel p-5 text-center flex flex-col items-center cursor-pointer" onclick="openAppModal('${key}')">
+                    <img src="${iconUrl}" class="app-icon mb-4">
+                    <h3 class="text-sm font-bold text-slate-100 mb-4 h-10 line-clamp-2">${app.realName}</h3>
+                    <button class="action-btn w-full">Details</button>
+                </div>`;
+                grid.innerHTML += html;
+                row.innerHTML += `<div class="row-item">${html}</div>`;
+            });
+        }
+
+        async function openAppModal(key) {
+            const app = APP_MAP[key];
+            const content = document.getElementById('modal-content');
+            document.getElementById('modal-overlay').classList.remove('hidden');
+            content.innerHTML = `<div class="flex justify-center py-10"><i class="fas fa-circle-notch animate-spin text-4xl text-blue-500"></i></div>`;
+
+            let descHtml = "No description available.";
+            if (app.descPath) {
+                const res = await fetch(getRawUrl(app.descPath));
+                const text = await res.text();
+                descHtml = text.replace(/\n/g, "<br>").replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-400 underline">$1</a>');
+            }
+
+            let ssHtml = "";
+            const screenshots = REPO_DATA.filter(item => 
+                item.path.startsWith(CONFIG.folders.ss) && 
+                item.path.toLowerCase().includes(key.toLowerCase() + "ss")
+            );
+
+            if(screenshots.length > 0) {
+                ssHtml = `<div class="ss-slider mb-6">`;
+                screenshots.forEach(ss => { ssHtml += `<img src="${getRawUrl(ss.path)}" class="ss-img">`; });
+                ssHtml += `</div>`;
+            }
+
+            const iconUrl = app.icon ? getRawUrl(app.icon) : 'https://cdn-icons-png.flaticon.com/512/2584/2584651.png';
+            content.innerHTML = `
+                <div class="flex flex-col md:flex-row gap-6 items-center md:items-start mb-8">
+                    <img src="${iconUrl}" class="w-24 h-24 rounded-2xl shadow-xl">
+                    <div class="flex-1 text-center md:text-left">
+                        <h2 class="text-2xl font-bold text-white mb-4">${app.realName}</h2>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                            <a href="${getRawUrl(app.apk)}" class="action-btn px-10 py-3 text-sm flex items-center gap-2"><i class="fas fa-download"></i> INSTALL</a>
+                            <a href="https://sshashmicpu.github.io/${key}/" target="_blank" class="bg-slate-800 text-white px-6 py-3 rounded-full font-bold text-xs">LIVE SITE</a>
+                        </div>
+                    </div>
+                </div>
+                ${ssHtml}
+                <div class="rich-description mb-6 p-4 bg-black/30 rounded-2xl border border-white/5">${descHtml}</div>
+            `;
+        }
+
+        function renderPDFs() {
+            const gridR = document.getElementById('grid-research');
+            const gridG = document.getElementById('grid-pdf-general');
+            const row = document.getElementById('row-galaxy');
+            REPO_DATA.forEach(item => {
+                if (item.path.includes(CONFIG.folders.pdf) && item.path.toLowerCase().endsWith('.pdf')) {
+                    const name = item.path.split('/').pop();
+                    const url = getRawUrl(item.path);
+                    const thumb = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=400&h=600&t=fit`;
+                    const html = `
+                    <div class="glass-panel p-3 h-full">
+                        <div class="pdf-preview-container mb-3">
+                            <img src="${thumb}" onerror="this.src='https://via.placeholder.com/400x600/1a1d29/38bdf8?text=PDF'">
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-300 line-clamp-2 h-8 mb-3">${name}</h3>
+                        <a href="${url}" target="_blank" class="block w-full bg-red-600/20 text-red-500 text-center py-2 rounded-full text-[10px] font-bold hover:bg-red-600 hover:text-white transition">READ NOW</a>
+                    </div>`;
+                    if (item.path.toLowerCase().includes('hashmi research hub')) gridR.innerHTML += html;
+                    else gridG.innerHTML += html;
+                    row.innerHTML += `<div class="row-item-wide">${html}</div>`;
+                }
+            });
+        }
+
+        function renderCodes() {
+            const grid = document.getElementById('grid-space');
+            const row = document.getElementById('row-space');
+            REPO_DATA.forEach(item => {
+                if (item.path.startsWith(CONFIG.folders.html) && item.path.toLowerCase().endsWith('.html')) {
+                    const name = item.path.split('/').pop();
+                    const html = `
+                    <div class="glass-panel p-6 flex justify-between items-center border-l-4 border-purple-500">
+                        <h3 class="font-bold text-white truncate mr-4">${name}</h3>
+                        <a href="${getRawUrl(item.path)}" target="_blank" class="bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-bold shrink-0">VIEW</a>
+                    </div>`;
+                    grid.innerHTML += html;
+                    row.innerHTML += `<div class="row-item-wide">${html}</div>`;
+                }
+            });
+        }
+
+        async function renderSites() {
+            const grid = document.getElementById('grid-station');
+            const row = document.getElementById('row-station');
+            const siteFiles = REPO_DATA.filter(i => i.path.startsWith(CONFIG.folders.sites));
+            for (let file of siteFiles) {
+                if(file.type === 'blob') {
+                    const res = await fetch(getRawUrl(file.path));
+                    const text = await res.text();
+                    text.split('\n').forEach(line => {
+                        const parts = line.trim().split('|');
+                        const url = parts[1] || parts[0];
+                        if (url && url.startsWith('http')) {
+                            const html = `
+                            <div class="glass-panel p-5 flex items-center gap-4">
+                                <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center"><i class="fas fa-link text-blue-400"></i></div>
+                                <div class="flex-1 truncate"><h3 class="font-bold text-white truncate text-sm">${parts[0] || 'Portal'}</h3></div>
+                                <a href="${url}" target="_blank" class="text-blue-400"><i class="fas fa-external-link-alt"></i></a>
+                            </div>`;
+                            grid.innerHTML += html;
+                            row.innerHTML += `<div class="row-item-wide">${html}</div>`;
+                        }
+                    });
+                }
+            }
+        }
+
+        function getRawUrl(path) { return `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${CONFIG.branch}/${path}`; }
+        function switchTab(tabId) { 
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); 
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden'); 
+            document.getElementById(`tab-${tabId}`).classList.add('active'); 
+        }
+        function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+        
+        document.getElementById('globalSearch').addEventListener('input', function(e) { 
+            const query = e.target.value.toLowerCase(); 
+            document.querySelectorAll('.glass-panel').forEach(card => { 
+                card.style.display = card.innerText.toLowerCase().includes(query) ? '' : 'none'; 
+            }); 
+        });
+        
+        init();
+    </script>
+</body>
+</html>
