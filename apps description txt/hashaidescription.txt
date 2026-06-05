@@ -1,0 +1,56 @@
+🔥 Hash Ai: Your Private, Powerful, and Limitless AI Companion! 🔥
+
+Tired of slow, restrictive AI? Introducing Hash Ai by HashTech, the revolutionary AI chatbot engineered to be blazingly fast, deeply private, and incredibly smart. Get ready to experience AI like never before – a tool that truly understands you, respects your privacy, and supercharges your productivity. Install Hash Ai now and unlock the future of intelligence!
+
+🚀 Why Choose Hash Ai? The Future of AI is Here, Today!
+
+We built Hash Ai with one core principle: to put YOU in control. Forget slow responses, data logging, and restrictive filters. Hash Ai is designed to empower you with unprecedented speed, privacy, and flexibility.
+
+🔒 Ultimate Privacy & Security:
+
+No Login, No Tracking, Zero Traces! Truly 100% anonymous. We don't ask for accounts, track your data, or store your conversations on our servers. Your chats are yours alone.
+Encrypted Routing Pipeline: Your data sessions are heavily guarded from server leaks, ensuring peace of mind with every interaction.
+Private & Personal Local Sandboxing: Your context stays isolated to you, providing a truly private and personalized experience.
+
+⚡ Blazingly Fast & Forever Free:
+
+Experience lightning-fast, sub-0.5 second token streaming! Hash Ai gives you instant, real-time responses that keep up with your thoughts.
+Enjoy a premium, cutting-edge AI architecture at absolutely no cost, forever!
+
+🔓 Sanction-Free & System Prompt Control:
+
+Break Free from Restrictions! Hash Ai allows you to bypass typical AI limitations. Chatbots are computer programs designed for human-like conversation, using AI and machine learning (ML) algorithms. However, some chatbots may have specific uses that do not align with user expectations, or they may be poorly discoverable, as highlighted by NN/g research.
+Dynamic System Prompt Control: Guide the AI's core behavior with your own custom system prompts. Make Hash Ai truly your AI.
+✨ Unrivaled Intelligence at Your Fingertips
+
+Powered by the advanced Hash Flash 2.0 (Hash Ai-2.5-Flash) model, Hash Ai is not just a chatbot; it's a multimodal powerhouse designed for every task you can imagine.
+
+🧠 Multimodal Mastery: Hash Ai can understand and generate responses from both text and images! Simply attach an image and ask anything – from descriptions to complex analysis.
+🌐 Real-time Web Search (Optional): Enable the powerful Tavily web search integration to get up-to-the-minute information and accurate responses, unlike many traditional AI models that draw only from older training data. This means Hash Ai isn't limited by outdated information, making its responses even more reliable.
+🌟 Features That Go Beyond the Ordinary Chatbot
+
+Hash Ai isn't just smart; it's designed for a superior user experience with features you won't find in typical AI assistants.
+
+⚡ Animated UI & Dynamic Theming: Experience a visually stunning interface with dynamic gradients, pulsating effects, and adaptive themes (Pure Black and Light mode). Our UI is not just functional, it's an experience!
+🗣️ Native Urdu Auto-RTL Alignment: For our Urdu-speaking users, Hash Ai intelligently detects Urdu content and automatically adjusts text direction to Right-to-Left (RTL) for a natural and comfortable reading experience.
+📝 Markdown & Rich Content Formatting: Get clear, organized answers with automatic headings, subheadings, bullet points, tables, code blocks, and highlighted text. Hash Ai makes complex information easy to digest.
+📊 Interactive Code Preview: If Hash Ai generates code, you can not only copy it with a single click but also see a live preview instantly within the app! This is perfect for developers and learners.
+🔄 Session & Tab Management: Don't lose your conversations! Hash Ai offers intuitive tab management to switch between multiple chats effortlessly, keeping your work organized. All your chat history is saved locally and accessible through a sidebar.
+💡 Intelligent Suggestions: After each AI response, get context-aware suggestions to continue your conversation, helping you explore topics deeper without thinking of the next prompt.
+🗑️ Message Control: Easily copy your own messages or delete specific AI or user messages to refine your chat history.
+⚙️ Advanced Configuration (Your Personal Control Panel):
+API Key Management: Securely input your Google AI Studio API key.
+Tavily API Integration: Add your optional Tavily API key for enhanced web search capabilities.
+Custom System Prompt: Tailor Hash Ai's personality and behavior to your exact needs. Make it a creative writer, a coding assistant, or a personal tutor – the choice is yours!
+🛠️ Get Started: Power Up Your Personal Assistant!
+
+To unlock Hash Ai's full potential, you'll need two API keys:
+
+Google AI Studio API Key: This key connects Hash Ai to the powerful Google Hash Ai models.
+How to get it: Visit Google AI Studio and create your API key.
+Tavily API Key (Optional but Recommended): For real-time web search capabilities.
+How to get it: Sign up on the Tavily website and generate your API key.
+
+Once you have your keys, simply go to the "Config" settings within Hash Ai and paste them in. Your personal, super-smart, and private AI assistant will be ready to serve you!
+
+Don't settle for less. Install Hash Ai now and transform the way you interact with artificial intelligence!
