@@ -1,0 +1,61 @@
+Smart Muhasib – Complete Islamic Self-Accountability Tracker
+Track Salah, Goals, Tasbeeh & More – All in One Modern App
+
+Why Smart Muhasib is the Best App for Your Spiritual & Personal Growth:
+
+✅ Complete Salah Tracker
+Easily mark each prayer as "Prayed," "On Time," and even "Nafl." The app automatically calculates your daily score, so you always know where you stand. (Optional: hide Nafl with a single toggle.)
+
+✅ Custom Goals
+Create your own targets using checkboxes, counters, or text entries. Whether it’s Quran recitation, daily Duas, or any habit, Smart Muhasib adapts to your needs.
+
+✅ Smart Tasbeeh Counter
+- Full-screen mode lets you tap anywhere to count.
+- Set a target and the app will beep when you complete a round, automatically tracking loops.
+- Auto Mode: Tap at your natural pace for 20 seconds – the app learns your speed and starts counting automatically! Pause, resume, or re-train anytime.
+
+✅ Multi-User Support
+Add family members, switch between users, copy goals from one user to another, and compare weekly or monthly performance. Perfect for the whole family.
+
+✅ Detailed Reports
+View your progress for today, this week, this month, or the whole year. The app highlights your best and weakest goals, helping you focus on improvement.
+
+✅ Offline & Private
+All your data is stored locally in your browser – no internet, no servers, no privacy concerns.
+
+✅ Beautiful Islamic Theme
+Choose between Light, Dark, or specially designed Islamic theme with warm, spiritual colors and gold accents.
+
+✅ Data Backup & Restore
+- Export all data as a JSON file or copy it as text to save safely.
+- Import previously saved data to restore your full history.
+- Reset everything with one click if needed.
+
+✅ Streak Tracking
+Monitor your longest streak based on any prayer (choose Fajr, Zohar, Asr, Maghrib, Isha, or Tahajjud). Stay motivated to maintain consistency.
+
+✅ Mood Logging
+Record your daily mood to reflect on your emotional and spiritual journey over time.
+
+✅ Tasbeeh Templates
+Quick-load popular Tasbeehs like SubhanAllah (33), Alhamdulillah (33), Allahu Akbar (34), Durood Sharif (100), Istighfar (100), and more.
+Plus, create your own custom templates with a name and target – or even a "Without Name" option.
+
+✅ History & Review
+View the last 10 days of performance at a glance – each day's score, completion count, and mood.
+
+✅ Intuitive Navigation
+Six main tabs (Home, Goals, Tasbeeh, Users, Reports, Settings) make it easy to switch between different parts of the app.
+
+Perfect for:
+- Individuals tracking their daily Salah and personal goals
+- Families monitoring each other’s progress
+- Anyone seeking to build consistent spiritual habits
+- Users who want a private, offline, and beautiful Islamic app
+
+Developed with care by HashTech – bringing modern technology and Islamic values together.
+
+Contact Developer: Syed Sakhir Hashmi
+Phone: 03046980280
+
+Start your journey today! Smart Muhasib makes accountability simple, beautiful, and effective. Download now and take control of your daily spiritual growth.
